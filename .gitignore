@@ -40,10 +40,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Excel data files
+# Excel data files (except production files)
 *.xlsx
 *.xls
 *.csv
+
+# Allow production Excel file
+!public/aluplan-list.xlsx
 
 # IDE files
 .vscode/
