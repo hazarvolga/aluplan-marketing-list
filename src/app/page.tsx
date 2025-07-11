@@ -430,6 +430,36 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Sales Hub Özet Bilgisi - Sadece Sales Hub Mevcut filtresi seçildiğinde göster */}
+        {filters.segments.salesHubMevcut && (
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg shadow-sm p-4 mb-6 border border-blue-200">
+            <div className="flex items-center gap-3">
+              <div className="text-blue-600">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-gray-900 mb-1">
+                  📊 Sales Hub Mevcut Özeti
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Görüntülenen <strong>{filteredData.length.toLocaleString()} kayıt</strong> Dynamics 365 Sales Hub sisteminde aktif olarak takip edilen müşterilerdir.
+                  Bu müşteriler sistem içinde işlenmiş ve CRM süreçlerine dahil edilmiştir.
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-green-600">
+                  {filteredData.length.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Aktif Müşteri
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-4">
