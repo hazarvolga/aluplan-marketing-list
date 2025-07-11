@@ -498,6 +498,45 @@ export default function Home() {
           </div>
         )}
 
+        {/* V2023 Virtual Segment Özeti */}
+        {(filters.segments.v2023 && 
+          !filters.segments.mevcutMusteriler && 
+          !filters.segments.potansiyelMusteriler && 
+          !filters.segments.salesHubMevcut && 
+          !filters.segments.v2022) && (
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm p-6 mb-6 border border-green-200">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-gray-900 mb-1">
+                  ⚡ V2023 ve Üzeri Müşteriler
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Görüntülenen <strong>{filteredData.length.toLocaleString()} kayıt</strong> V2023, V2024, V2025 sürümleri kullanan aktif müşterilerdir.
+                  Bu müşteriler en güncel Allplan teknolojisini kullanmakta ve yüksek aktivite seviyesine sahiptir.
+                </p>
+                <div className="mt-2 text-xs text-green-600 bg-green-50 p-2 rounded">
+                  <strong>Aktif Segment:</strong> Bu müşteriler Allplan Müşteri Veritabanı'ndan V2023 ve üzeri sürümleri kullanan aktif müşterilerdir. 
+                  Modern teknoloji kullanıcıları olup, upgrade potansiyeli yüksek müşteri grubudur. 
+                  Çoğu Sales Hub Mevcut ve Mevcut Müşteriler segmentlerinde bulunur.
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-green-600">
+                  {filteredData.length.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500">
+                  V2023+ Müşteri
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-4">
