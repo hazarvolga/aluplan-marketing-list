@@ -271,25 +271,6 @@ export default function Home() {
               <p className="text-xs text-gray-500">Geçici/Spam servis</p>
             </div>
           </div>
-
-          {/* Data Processing Summary */}
-          <div className="bg-white rounded-lg p-4 border border-blue-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Veri Birleştirme Süreci Özeti</h3>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              Bu projede 5 farklı Excel dosyası birleştirildi: <strong>Active Account Products</strong> (yaklaşık 1,200 kayıt), 
-              <strong>All Contacts-Dynamics-365</strong> (3,500+ kayıt), <strong>Allplan Müşteriler Final</strong> (2,800 kayıt), 
-              <strong>Mautic Liste</strong> (4,100 kayıt) ve <strong>DNC</strong> dosyası (143 kişi). 
-              Contacts-Dynamics dosyasında 200+ eksik email, Active Account'ta 50+ tekrar kayıt, 
-              Mautic listesinde 150+ geçersiz email formatı tespit edildi. 
-              Segment bilgileri virgülle ayrılmış şekilde standardize edildi (Mautic, Sales Hub Mevcut, V2022 ve eski, V2023 ve üzeri).
-            </p>
-            <button
-              onClick={() => setShowSpamModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
-            >
-              🛡️ Spam Filtresi Detayları
-            </button>
-          </div>
         </div>
 
         {/* File Upload */}
@@ -447,6 +428,11 @@ export default function Home() {
                   Görüntülenen <strong>{filteredData.length.toLocaleString()} kayıt</strong> Dynamics 365 Sales Hub sisteminde aktif olarak takip edilen müşterilerdir.
                   Bu müşteriler sistem içinde işlenmiş ve CRM süreçlerine dahil edilmiştir.
                 </p>
+                <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                  <strong>Veri Kalitesi:</strong> Dynamics 365'te toplam 1,202 kontak bulunmaktadır. 
+                  157 kayıt boş email adresine sahip, 13 kayıt geçersiz email formatında olduğu için filtrelenmiştir. 
+                  Sonuç olarak %85.9 veri kalitesiyle 1,032 geçerli kontak sisteme alınmıştır.
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-green-600">
@@ -470,6 +456,9 @@ export default function Home() {
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.total.toLocaleString()}
             </p>
+            <p className="text-xs text-gray-500 mt-1">
+              5 kaynak birleştirildi • 2 tekrar kayıt
+            </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -478,6 +467,9 @@ export default function Home() {
             </div>
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.mevcutMusteriler.toLocaleString()}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              %100 şirket bilgisi • Telefon eksik
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -488,6 +480,9 @@ export default function Home() {
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.potansiyelMusteriler.toLocaleString()}
             </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Mautic liste • %58 şirket • %11 telefon
+            </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -496,6 +491,12 @@ export default function Home() {
             </div>
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.salesHubMevcut.toLocaleString()}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Dynamics 365 • %97 şirket • %100 isim
+            </p>
+            <p className="text-xs text-blue-600 mt-1 font-medium">
+              Not: Dynamics'te 1,202 kontak • 157 boş email + 13 geçersiz format filtrelendi
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -506,6 +507,9 @@ export default function Home() {
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.v2022.toLocaleString()}
             </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Tüm kayıtlar mevcut sistem de
+            </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -514,6 +518,9 @@ export default function Home() {
             </div>
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.v2023.toLocaleString()}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              31 yeni kayıt hazır • Entegre edilmemiş
             </p>
           </div>
         </div>
