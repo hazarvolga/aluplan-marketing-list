@@ -6,6 +6,7 @@ export interface MarketingData {
   company: string;
   phone: string;
   segment: string;
+  processingStatus: 'Sales Hub İşlenmiş' | 'Sales Hub İşlenmemiş' | 'Potansiyel' | 'Diğer';
   isMevcutMusteriler: boolean;
   isPotansiyelMusteriler: boolean;
   isSalesHubMevcut: boolean;
@@ -37,12 +38,25 @@ export function processExcelData(buffer: ArrayBuffer): MarketingData[] {
     const email = String(row.email || '');
     const spamCheck = checkSpamEmail(email);
     
+    // İşlenme durumunu belirle
+    let processingStatus: 'Sales Hub İşlenmiş' | 'Sales Hub İşlenmemiş' | 'Potansiyel' | 'Diğer';
+    if (segment.includes('sales hub mevcut')) {
+      processingStatus = 'Sales Hub İşlenmiş';
+    } else if (segment.includes('mevcut müşteriler')) {
+      processingStatus = 'Sales Hub İşlenmemiş';
+    } else if (segment.includes('potansiyel müşteriler')) {
+      processingStatus = 'Potansiyel';
+    } else {
+      processingStatus = 'Diğer';
+    }
+    
     return {
       name: String(row.name || ''),
       email: email,
       company: String(row.company || ''),
       phone: String(row.phone || ''),
       segment: String(row.segment || ''),
+      processingStatus: processingStatus,
       isMevcutMusteriler: segment.includes('mevcut müşteriler'),
       isPotansiyelMusteriler: segment.includes('potansiyel müşteriler'),
       isSalesHubMevcut: segment.includes('sales hub mevcut'),
@@ -74,7 +88,7 @@ export function filterData(data: MarketingData[], filters: FilterOptions): Marke
     if (!hasActiveFilters) return true;
 
     return (
-      (segments.mevcutMusteriler && item.isMevcutMusteriler) ||
+      (segments.mevcutMusteriler && (item.isMevcutMusteriler || item.isSalesHubMevcut)) ||
       (segments.potansiyelMusteriler && item.isPotansiyelMusteriler) ||
       (segments.salesHubMevcut && item.isSalesHubMevcut) ||
       (segments.v2022 && item.isV2022) ||
@@ -86,7 +100,7 @@ export function filterData(data: MarketingData[], filters: FilterOptions): Marke
 export function getSegmentCounts(data: MarketingData[]) {
   return {
     total: data.length,
-    mevcutMusteriler: data.filter(item => item.isMevcutMusteriler).length,
+    mevcutMusteriler: data.filter(item => item.isMevcutMusteriler || item.isSalesHubMevcut).length,
     potansiyelMusteriler: data.filter(item => item.isPotansiyelMusteriler).length,
     salesHubMevcut: data.filter(item => item.isSalesHubMevcut).length,
     v2022: data.filter(item => item.isV2022).length,
@@ -95,13 +109,14 @@ export function getSegmentCounts(data: MarketingData[]) {
 }
 
 export function exportToCSV(data: MarketingData[]): string {
-  const headers = ['Name', 'Email', 'Company', 'Phone', 'Segment'];
+  const headers = ['Name', 'Email', 'Company', 'Phone', 'Segment', 'Processing Status'];
   const rows = data.map(item => [
     item.name,
     item.email,
     item.company,
     item.phone,
-    item.segment
+    item.segment,
+    item.processingStatus
   ]);
   
   const csvContent = [headers, ...rows]

@@ -366,7 +366,7 @@ export default function Home() {
                 </span>
               </div>
               <div className="ml-6 text-xs text-gray-500">
-                allplan müşteriler_final_2025-03-19-r28.xlsx dosyasından alınan veriler
+                Dynamics 365 + Allplan Final dosyalarından alınan tüm müşteri verileri
               </div>
             </label>
             <label className="flex flex-col space-y-1">
@@ -396,6 +396,9 @@ export default function Home() {
                 <span className="text-sm font-semibold text-gray-800">
                   Sales Hub Mevcut ({segmentCounts.salesHubMevcut.toLocaleString()})
                 </span>
+              </div>
+              <div className="ml-6 text-xs text-gray-500">
+                Dynamics 365 sistemindeki aktif müşteriler
               </div>
             </label>
             <label className="flex flex-col space-y-1">
@@ -593,6 +596,19 @@ export default function Home() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Segment
                     </th>
+                    <th 
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => handleSort('processingStatus')}
+                    >
+                      <div className="flex items-center gap-2">
+                        İşlenme Durumu
+                        {sortConfig.key === 'processingStatus' && (
+                          sortConfig.direction === 'asc' ? 
+                            <ChevronUp className="w-4 h-4" /> : 
+                            <ChevronDown className="w-4 h-4" />
+                        )}
+                      </div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -667,6 +683,19 @@ export default function Home() {
                             </span>
                           )}
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          item.processingStatus === 'Sales Hub İşlenmiş' ? 'bg-green-100 text-green-800' :
+                          item.processingStatus === 'Sales Hub İşlenmemiş' ? 'bg-yellow-100 text-yellow-800' :
+                          item.processingStatus === 'Potansiyel' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {item.processingStatus === 'Sales Hub İşlenmiş' ? '✅ İşlenmiş' :
+                           item.processingStatus === 'Sales Hub İşlenmemiş' ? '⏳ İşlenmemiş' :
+                           item.processingStatus === 'Potansiyel' ? '🔍 Potansiyel' :
+                           '❓ Diğer'}
+                        </span>
                       </td>
                     </tr>
                   ))}
