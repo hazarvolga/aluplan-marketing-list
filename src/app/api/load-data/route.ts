@@ -5,8 +5,8 @@ import * as path from 'path';
 
 export async function GET() {
   try {
-    // Path to the default Excel file
-    const filePath = path.join(process.cwd(), 'data', 'ALLPLAN_MARKETING_LIST_SUPER_BASIT.xlsx');
+    // Path to the updated Excel file with new segment structure
+    const filePath = path.join(process.cwd(), 'data', 'aluplan-list.xlsx');
     
     // Check if file exists
     if (!fs.existsSync(filePath)) {

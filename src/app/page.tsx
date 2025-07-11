@@ -22,7 +22,8 @@ export default function Home() {
   });
   const [filters, setFilters] = useState<FilterOptions>({
     segments: {
-      mautic: false,
+      mevcutMusteriler: false,
+      potansiyelMusteriler: false,
       salesHubMevcut: false,
       v2022: false,
       v2023: false,
@@ -138,7 +139,8 @@ export default function Home() {
   const resetFilters = () => {
     setFilters({
       segments: {
-        mautic: false,
+        mevcutMusteriler: false,
+        potansiyelMusteriler: false,
         salesHubMevcut: false,
         v2022: false,
         v2023: false,
@@ -350,56 +352,83 @@ export default function Home() {
           </div>
 
           {/* Segment Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={filters.segments.mautic}
-                onChange={() => handleSegmentFilterChange('mautic')}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-semibold text-gray-800">
-                Mautic ({segmentCounts.mautic.toLocaleString()})
-              </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <label className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={filters.segments.mevcutMusteriler}
+                  onChange={() => handleSegmentFilterChange('mevcutMusteriler')}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-semibold text-gray-800">
+                  Mevcut Müşteriler ({segmentCounts.mevcutMusteriler.toLocaleString()})
+                </span>
+              </div>
+              <div className="ml-6 text-xs text-gray-500">
+                allplan müşteriler_final_2025-03-19-r28.xlsx dosyasından alınan veriler
+              </div>
             </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={filters.segments.salesHubMevcut}
-                onChange={() => handleSegmentFilterChange('salesHubMevcut')}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-semibold text-gray-800">
-                Sales Hub Mevcut ({segmentCounts.salesHubMevcut.toLocaleString()})
-              </span>
+            <label className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={filters.segments.potansiyelMusteriler}
+                  onChange={() => handleSegmentFilterChange('potansiyelMusteriler')}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-semibold text-gray-800">
+                  Potansiyel Müşteriler ({segmentCounts.potansiyelMusteriler.toLocaleString()})
+                </span>
+              </div>
+              <div className="ml-6 text-xs text-gray-500">
+                mautic-tum-liste.xlsx dosyasından alınan veriler
+              </div>
             </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={filters.segments.v2022}
-                onChange={() => handleSegmentFilterChange('v2022')}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-semibold text-gray-800">
-                V2022 ve eski ({segmentCounts.v2022.toLocaleString()})
-              </span>
+            <label className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={filters.segments.salesHubMevcut}
+                  onChange={() => handleSegmentFilterChange('salesHubMevcut')}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-semibold text-gray-800">
+                  Sales Hub Mevcut ({segmentCounts.salesHubMevcut.toLocaleString()})
+                </span>
+              </div>
             </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={filters.segments.v2023}
-                onChange={() => handleSegmentFilterChange('v2023')}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-semibold text-gray-800">
-                V2023 ve üzeri ({segmentCounts.v2023.toLocaleString()})
-              </span>
+            <label className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={filters.segments.v2022}
+                  onChange={() => handleSegmentFilterChange('v2022')}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-semibold text-gray-800">
+                  V2022 ve eski ({segmentCounts.v2022.toLocaleString()})
+                </span>
+              </div>
+            </label>
+            <label className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={filters.segments.v2023}
+                  onChange={() => handleSegmentFilterChange('v2023')}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-semibold text-gray-800">
+                  V2023 ve üzeri ({segmentCounts.v2023.toLocaleString()})
+                </span>
+              </div>
             </label>
           </div>
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center gap-2 mb-2">
               <BarChart3 className="w-4 h-4 text-blue-500" />
@@ -411,11 +440,20 @@ export default function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-sm font-medium text-gray-600">Mautic</span>
+              <div className="w-4 h-4 bg-blue-500 rounded"></div>
+              <span className="text-sm font-medium text-gray-600">Mevcut Müşteriler</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {filteredCounts.mautic.toLocaleString()}
+              {filteredCounts.mevcutMusteriler.toLocaleString()}
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-4 h-4 bg-green-500 rounded"></div>
+              <span className="text-sm font-medium text-gray-600">Potansiyel Müşteriler</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-900">
+              {filteredCounts.potansiyelMusteriler.toLocaleString()}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -603,9 +641,14 @@ export default function Home() {
                       )}
                       <td className="px-6 py-4 text-sm text-gray-500">
                         <div className="flex flex-wrap gap-1">
-                          {item.isMautic && (
+                          {item.isMevcutMusteriler && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              Mevcut Müşteri
+                            </span>
+                          )}
+                          {item.isPotansiyelMusteriler && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Mautic
+                              Potansiyel Müşteri
                             </span>
                           )}
                           {item.isSalesHubMevcut && (

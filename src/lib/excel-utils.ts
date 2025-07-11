@@ -6,7 +6,8 @@ export interface MarketingData {
   company: string;
   phone: string;
   segment: string;
-  isMautic: boolean;
+  isMevcutMusteriler: boolean;
+  isPotansiyelMusteriler: boolean;
   isSalesHubMevcut: boolean;
   isV2022: boolean;
   isV2023: boolean;
@@ -16,7 +17,8 @@ export interface MarketingData {
 
 export interface FilterOptions {
   segments: {
-    mautic: boolean;
+    mevcutMusteriler: boolean;
+    potansiyelMusteriler: boolean;
     salesHubMevcut: boolean;
     v2022: boolean;
     v2023: boolean;
@@ -41,7 +43,8 @@ export function processExcelData(buffer: ArrayBuffer): MarketingData[] {
       company: String(row.company || ''),
       phone: String(row.phone || ''),
       segment: String(row.segment || ''),
-      isMautic: segment.includes('mautic'),
+      isMevcutMusteriler: segment.includes('mevcut müşteriler'),
+      isPotansiyelMusteriler: segment.includes('potansiyel müşteriler'),
       isSalesHubMevcut: segment.includes('sales hub mevcut'),
       isV2022: segment.includes('v2022'),
       isV2023: segment.includes('v2023'),
@@ -71,7 +74,8 @@ export function filterData(data: MarketingData[], filters: FilterOptions): Marke
     if (!hasActiveFilters) return true;
 
     return (
-      (segments.mautic && item.isMautic) ||
+      (segments.mevcutMusteriler && item.isMevcutMusteriler) ||
+      (segments.potansiyelMusteriler && item.isPotansiyelMusteriler) ||
       (segments.salesHubMevcut && item.isSalesHubMevcut) ||
       (segments.v2022 && item.isV2022) ||
       (segments.v2023 && item.isV2023)
@@ -82,7 +86,8 @@ export function filterData(data: MarketingData[], filters: FilterOptions): Marke
 export function getSegmentCounts(data: MarketingData[]) {
   return {
     total: data.length,
-    mautic: data.filter(item => item.isMautic).length,
+    mevcutMusteriler: data.filter(item => item.isMevcutMusteriler).length,
+    potansiyelMusteriler: data.filter(item => item.isPotansiyelMusteriler).length,
     salesHubMevcut: data.filter(item => item.isSalesHubMevcut).length,
     v2022: data.filter(item => item.isV2022).length,
     v2023: data.filter(item => item.isV2023).length,
