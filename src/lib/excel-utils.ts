@@ -211,13 +211,48 @@ export function checkSpamEmail(email: string): SpamCheckResult {
     return { isSpam: true, reason: 'Geçersiz email formatı', email, score: 100 };
   }
   
+  // Email format validation
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    return { isSpam: true, reason: 'Geçersiz email formatı', email, score: 100 };
+  }
+  
+  // Check for dangerous characters (XSS, SQL injection, etc.)
+  if (email.includes('<') || email.includes('>') || email.includes('\'') || 
+      email.includes('"') || email.includes('\\') || email.includes('\x00') ||
+      email.includes('\r') || email.includes('\n') || email.includes('\t')) {
+    return { isSpam: true, reason: 'Güvenlik tehdidi karakterler', email, score: 100 };
+  }
+  
+  // Check for double dots or invalid domain formats
+  if (email.includes('..') || domain.endsWith('.') || domain.includes('..')) {
+    return { isSpam: true, reason: 'Geçersiz domain formatı', email, score: 100 };
+  }
+  
+  // Check for IP addresses (suspicious but not always spam)
+  if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(domain) || 
+      /^\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\]$/.test(domain)) {
+    score = Math.max(score, 60);
+    reasons.push('IP address domain');
+  }
+  
+  // Check for very long emails (potential DOS attack)
+  if (email.length > 254 || domain.length > 253) {
+    return { isSpam: true, reason: 'Çok uzun email', email, score: 100 };
+  }
+  
   // High-risk spam domains (90-100 puan)
   const highRiskDomains = [
     '10minutemail.com', 'tempmail.org', 'guerrillamail.com', 'mailinator.com',
     'yopmail.com', 'temp-mail.org', 'dispostable.com', 'throwaway.email'
   ];
   
-  if (highRiskDomains.includes(domain)) {
+  // Check for subdomain bypass
+  const isDomainOrSubdomain = (targetDomain: string) => {
+    return domain === targetDomain || domain.endsWith('.' + targetDomain);
+  };
+  
+  if (highRiskDomains.some(isDomainOrSubdomain)) {
     score = 95;
     reasons.push('Geçici email servisi');
   }
@@ -227,7 +262,7 @@ export function checkSpamEmail(email: string): SpamCheckResult {
     'getnada.com', 'maildrop.cc', 'sharklasers.com', 'grr.la'
   ];
   
-  if (mediumRiskDomains.includes(domain)) {
+  if (mediumRiskDomains.some(isDomainOrSubdomain)) {
     score = 70;
     reasons.push('Şüpheli email servisi');
   }
@@ -241,6 +276,17 @@ export function checkSpamEmail(email: string): SpamCheckResult {
   if (typoDomains.includes(domain)) {
     score = 50;
     reasons.push('Typo domain');
+  }
+  
+  // Test/example domains (should be flagged as spam)
+  const testDomains = [
+    'example.com', 'test.com', 'sample.com', 'demo.com',
+    'localhost', '127.0.0.1'
+  ];
+  
+  if (testDomains.includes(domain)) {
+    score = 80;
+    reasons.push('Test/example domain');
   }
   
   // Suspicious patterns (10-30 puan)
@@ -271,7 +317,7 @@ export function checkSpamEmail(email: string): SpamCheckResult {
   }
   
   const reason = reasons.length > 0 ? reasons.join(', ') : 'Geçerli email';
-  const isSpam = score >= 40; // 40 puan üzeri spam kabul et
+  const isSpam = score >= 30; // Lowered threshold for better security
   
   return { isSpam, reason, email, score };
 }
