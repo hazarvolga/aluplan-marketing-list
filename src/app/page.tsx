@@ -457,7 +457,7 @@ export default function Home() {
               {filteredCounts.total.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              5 kaynak birleştirildi • 2 tekrar kayıt
+              5 kaynak birleştirildi
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -469,7 +469,7 @@ export default function Home() {
               {filteredCounts.mevcutMusteriler.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              %100 şirket bilgisi • Telefon eksik
+              %100 şirket bilgisi
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -481,7 +481,7 @@ export default function Home() {
               {filteredCounts.potansiyelMusteriler.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              Mautic liste • %58 şirket • %11 telefon
+              Mautic kaynak
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -493,7 +493,7 @@ export default function Home() {
               {filteredCounts.salesHubMevcut.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              Dynamics 365 • %97 şirket • %100 isim
+              Dynamics 365 kaynak
             </p>
             <p className="text-xs text-blue-600 mt-1 font-medium">
               Not: Dynamics'te 1,202 kontak • 157 boş email + 13 geçersiz format filtrelendi
@@ -507,9 +507,6 @@ export default function Home() {
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.v2022.toLocaleString()}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Tüm kayıtlar mevcut sistem de
-            </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -518,9 +515,6 @@ export default function Home() {
             </div>
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.v2023.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              31 yeni kayıt hazır • Entegre edilmemiş
             </p>
           </div>
         </div>
