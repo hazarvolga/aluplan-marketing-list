@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# GitHub Repository Oluşturma Talimatları
+echo "📋 GitHub'da repository oluşturmak için şu adımları izleyin:"
+echo "=============================================="
+echo "1. https://github.com/hazarvolga adresine gidin"
+echo "2. 'New repository' butonuna tıklayın"
+echo "3. Repository name: aluplan-marketing-list"
+echo "4. Description: Aluplan Marketing Data Filter - Excel verilerini filtreleyin ve analiz edin"
+echo "5. Public seçin"
+echo "6. Initialize seçeneklerini boş bırakın"
+echo "7. 'Create repository' butonuna tıklayın"
+echo "=============================================="
+echo ""
+echo "Repository oluşturduktan sonra aşağıdaki komutları çalıştırın:"
+echo ""
+echo "git remote add origin https://github.com/hazarvolga/aluplan-marketing-list.git"
+echo "git branch -M main"
+echo "git push -u origin main"
+echo ""
+echo "=============================================="
+echo "🎯 Repository URL: https://github.com/hazarvolga/aluplan-marketing-list"
+echo "=============================================="
