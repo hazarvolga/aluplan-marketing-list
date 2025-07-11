@@ -1,0 +1,14 @@
+# Plesk için .htaccess (eğer Apache kullanıyorsa)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^$ app.js [L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ app.js [L]
+</IfModule>
+
+# Passenger Node.js ayarları
+PassengerAppType node
+PassengerStartupFile app.js
+PassengerAppRoot /
+PassengerNodejs /usr/bin/node
