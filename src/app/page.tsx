@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Upload, Search, Download, Filter, BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
-import { MarketingData, FilterOptions, processExcelData, filterData, getSegmentCounts, exportToCSV, getDataQualityStats, checkSpamEmail, getCompanyStats } from '@/lib/excel-utils';
+import { MarketingData, FilterOptions, processExcelData, filterData, getSegmentCounts, exportToCSV, getDataQualityStats, checkSpamEmail, getCompanyStats, removeDuplicateEmails, getDuplicateEmailInfo } from '@/lib/excel-utils';
 // import { cn } from '@/lib/utils';
 
 export default function Home() {
@@ -132,7 +132,9 @@ export default function Home() {
   };
 
   const handleExport = () => {
-    const csv = exportToCSV(filteredData);
+    // Remove duplicate emails before export
+    const cleanedData = removeDuplicateEmails(filteredData);
+    const csv = exportToCSV(cleanedData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -575,13 +577,26 @@ export default function Home() {
         {/* Export Button */}
         {filteredData.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <button
-              onClick={handleExport}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              Filtrelenmiş Veriyi İndir ({filteredData.length.toLocaleString()} kayıt)
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleExport}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Filtrelenmiş Veriyi İndir ({filteredData.length.toLocaleString()} kayıt)
+              </button>
+              {(() => {
+                const duplicateInfo = getDuplicateEmailInfo(filteredData);
+                if (duplicateInfo.duplicateCount > 0) {
+                  return (
+                    <div className="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-lg">
+                      📧 {duplicateInfo.duplicateCount} duplicate email otomatik kaldırılacak
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
           </div>
         )}
 

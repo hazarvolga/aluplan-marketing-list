@@ -303,3 +303,61 @@ export function getCompanyStats(data: MarketingData[]) {
 }
 
 // Force reload
+export function removeDuplicateEmails(data: MarketingData[]): MarketingData[] {
+  const seen = new Set<string>();
+  const result: MarketingData[] = [];
+  const duplicateInfo: { email: string; count: number }[] = [];
+  
+  // İlk geçiş: duplicate'ları tespit et
+  const emailCounts = data.reduce((acc, item) => {
+    acc[item.email] = (acc[item.email] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  // Duplicate email'leri kaydet
+  Object.entries(emailCounts).forEach(([email, count]) => {
+    if (count > 1) {
+      duplicateInfo.push({ email, count });
+    }
+  });
+  
+  // İkinci geçiş: her email'den sadece ilkini al
+  data.forEach(item => {
+    if (!seen.has(item.email)) {
+      seen.add(item.email);
+      result.push(item);
+    }
+  });
+  
+  return result;
+}
+
+export function getDuplicateEmailInfo(data: MarketingData[]): { 
+  duplicateEmails: string[]; 
+  duplicateCount: number; 
+  cleanedCount: number;
+  removedCount: number;
+} {
+  const emailCounts = data.reduce((acc, item) => {
+    acc[item.email] = (acc[item.email] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const duplicateEmails = Object.entries(emailCounts)
+    .filter(([, count]) => count > 1)
+    .map(([email]) => email);
+  
+  const duplicateCount = Object.values(emailCounts)
+    .filter(count => count > 1)
+    .reduce((sum, count) => sum + count, 0);
+  
+  const cleanedCount = data.length - duplicateEmails.length;
+  const removedCount = duplicateCount - duplicateEmails.length;
+  
+  return {
+    duplicateEmails,
+    duplicateCount,
+    cleanedCount,
+    removedCount
+  };
+}
