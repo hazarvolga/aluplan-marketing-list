@@ -6,13 +6,14 @@ import * as path from 'path';
 export async function GET() {
   try {
     // Path to the updated Excel file with new segment structure
-    const filePath = path.join(process.cwd(), 'data', 'aluplan-list.xlsx');
+    const filePath = path.join(process.cwd(), 'public', 'aluplan-list.xlsx');
     
     // Check if file exists
     if (!fs.existsSync(filePath)) {
       return NextResponse.json({
         success: false,
-        error: 'Default data file not found'
+        error: 'Default data file not found',
+        attemptedPath: filePath
       }, { status: 404 });
     }
 
