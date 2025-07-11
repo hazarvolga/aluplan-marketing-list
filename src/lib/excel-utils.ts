@@ -1,4 +1,6 @@
 import * as XLSX from 'xlsx';
+import { V2022_EMAILS } from './v2022-emails';
+import { V2023_EMAILS } from '../data/v2023-emails';
 
 export interface MarketingData {
   name: string;
@@ -33,19 +35,22 @@ export function processExcelData(buffer: ArrayBuffer): MarketingData[] {
   const worksheet = workbook.Sheets[sheetName];
   const rawData = XLSX.utils.sheet_to_json(worksheet);
 
-  return rawData.map((row: any) => {
+  return rawData.map((row: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const segment = String(row.segment || '').toLowerCase();
     const email = String(row.email || '');
     const spamCheck = checkSpamEmail(email);
     
     // İşlenme durumunu belirle
     let processingStatus: 'Sales Hub İşlenmiş' | 'Sales Hub İşlenmemiş' | 'Potansiyel' | 'Diğer';
-    if (segment.includes('sales hub mevcut')) {
+    const segmentLower = segment.toLowerCase();
+    if (segmentLower.includes('sales hub mevcut')) {
       processingStatus = 'Sales Hub İşlenmiş';
-    } else if (segment.includes('mevcut müşteriler')) {
+    } else if (segmentLower.includes('mevcut müşteriler')) {
       processingStatus = 'Sales Hub İşlenmemiş';
-    } else if (segment.includes('potansiyel müşteriler')) {
+    } else if (segmentLower.includes('potansiyel müşteriler')) {
       processingStatus = 'Potansiyel';
+    } else if (segmentLower.includes('v2023') || segmentLower.includes('v2022')) {
+      processingStatus = 'Sales Hub İşlenmiş';
     } else {
       processingStatus = 'Diğer';
     }
@@ -57,11 +62,11 @@ export function processExcelData(buffer: ArrayBuffer): MarketingData[] {
       phone: String(row.phone || ''),
       segment: String(row.segment || ''),
       processingStatus: processingStatus,
-      isMevcutMusteriler: segment.includes('mevcut müşteriler'),
-      isPotansiyelMusteriler: segment.includes('potansiyel müşteriler'),
-      isSalesHubMevcut: segment.includes('sales hub mevcut'),
-      isV2022: segment.includes('v2022'),
-      isV2023: segment.includes('v2023'),
+      isMevcutMusteriler: segmentLower.includes('mevcut müşteriler'),
+      isPotansiyelMusteriler: segmentLower.includes('potansiyel müşteriler'),
+      isSalesHubMevcut: segmentLower.includes('sales hub mevcut'),
+      isV2022: segmentLower.includes('v2022') || V2022_EMAILS.has(email.toLowerCase().trim()),
+      isV2023: V2023_EMAILS.has(email.toLowerCase().trim()), // Sadece Allplan Müşteriler Final listesi
       spamScore: spamCheck.score,
       spamReason: spamCheck.reason,
     };
@@ -138,8 +143,14 @@ export interface DataQualityStats {
 
 export function getDataQualityStats(data: MarketingData[]): DataQualityStats {
   const emails = data.map(item => item.email).filter(email => email);
-  const uniqueEmails = [...new Set(emails)];
-  const duplicateEmails = emails.length - uniqueEmails.length;
+  
+  // Proper duplicate email count - count records with duplicate emails
+  const emailCounts = emails.reduce((acc, email) => {
+    acc[email] = (acc[email] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  const duplicateEmails = Object.values(emailCounts).reduce((total, count) => 
+    count > 1 ? total + count : total, 0);
   
   // Email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -171,7 +182,7 @@ export function getDataQualityStats(data: MarketingData[]): DataQualityStats {
 }
 
 // Common spam/disposable email domains
-const SPAM_DOMAINS = [
+/* const SPAM_DOMAINS = [
   // Disposable email services
   '10minutemail.com', 'tempmail.org', 'guerrillamail.com', 'mailinator.com',
   'yopmail.com', 'temp-mail.org', 'dispostable.com', 'throwaway.email',
@@ -181,7 +192,7 @@ const SPAM_DOMAINS = [
   // Common typos
   'gmial.com', 'gmai.com', 'yahooo.com', 'hotmial.com',
   'outlok.com', 'gmailcom', 'yahoo.co', 'hotmail.co'
-];
+]; */
 
 export interface SpamCheckResult {
   isSpam: boolean;
@@ -194,7 +205,7 @@ export function checkSpamEmail(email: string): SpamCheckResult {
   const emailLower = email.toLowerCase();
   const domain = emailLower.split('@')[1];
   let score = 0;
-  let reasons: string[] = [];
+  const reasons: string[] = [];
   
   if (!domain) {
     return { isSpam: true, reason: 'Geçersiz email formatı', email, score: 100 };
@@ -278,3 +289,17 @@ export function getSpamStats(data: MarketingData[]) {
     spamEmails: spamEmails,
   };
 }
+
+export function getCompanyStats(data: MarketingData[]) {
+  const mevcutMusteriler = data.filter(item => item.isMevcutMusteriler || item.isSalesHubMevcut);
+  const withCompany = mevcutMusteriler.filter(item => item.company.trim());
+  
+  return {
+    totalMevcut: mevcutMusteriler.length,
+    withCompany: withCompany.length,
+    withoutCompany: mevcutMusteriler.length - withCompany.length,
+    companyPercentage: mevcutMusteriler.length > 0 ? Math.round((withCompany.length / mevcutMusteriler.length) * 100) : 0,
+  };
+}
+
+// Force reload

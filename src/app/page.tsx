@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Upload, Search, Download, Filter, BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
-import { MarketingData, FilterOptions, processExcelData, filterData, getSegmentCounts, exportToCSV, getDataQualityStats, checkSpamEmail } from '@/lib/excel-utils';
-import { cn } from '@/lib/utils';
+import { MarketingData, FilterOptions, processExcelData, filterData, getSegmentCounts, exportToCSV, getDataQualityStats, checkSpamEmail, getCompanyStats } from '@/lib/excel-utils';
+// import { cn } from '@/lib/utils';
 
 export default function Home() {
   const [data, setData] = useState<MarketingData[]>([]);
@@ -46,7 +46,11 @@ export default function Home() {
       switch (qualityFilter) {
         case 'duplicateEmails':
           const emails = data.map(item => item.email).filter(email => email);
-          const duplicateEmailList = emails.filter((email, index) => emails.indexOf(email) !== index);
+          const emailCounts = emails.reduce((acc, email) => {
+            acc[email] = (acc[email] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          const duplicateEmailList = Object.keys(emailCounts).filter(email => emailCounts[email] > 1);
           filtered = filtered.filter(item => duplicateEmailList.includes(item.email));
           break;
         case 'invalidEmails':
@@ -164,7 +168,7 @@ export default function Home() {
   };
 
   const sortedData = React.useMemo(() => {
-    let sortableData = [...filteredData];
+    const sortableData = [...filteredData];
     if (sortConfig.key) {
       sortableData.sort((a, b) => {
         const aValue = a[sortConfig.key!];
@@ -185,6 +189,7 @@ export default function Home() {
   const segmentCounts = getSegmentCounts(data);
   const filteredCounts = getSegmentCounts(filteredData);
   const qualityStats = getDataQualityStats(data);
+  const companyStats = getCompanyStats(data);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -379,7 +384,7 @@ export default function Home() {
                 </span>
               </div>
               <div className="ml-6 text-xs text-gray-500">
-                Dynamics 365 sistemindeki aktif müşteriler
+                Dynamics 365 sistemindeki aktif müşteriler (V2022/V2023 virtual segment toplamından büyüktür - normal durum)
               </div>
             </label>
             <label className="flex flex-col space-y-1">
@@ -394,6 +399,9 @@ export default function Home() {
                   V2022 ve eski ({segmentCounts.v2022.toLocaleString()})
                 </span>
               </div>
+              <p className="text-xs text-gray-500 ml-6">
+                Email bazlı eşleştirme ile V2022 ve daha eski sürümleri kullanan müşteriler
+              </p>
             </label>
             <label className="flex flex-col space-y-1">
               <div className="flex items-center space-x-2">
@@ -407,6 +415,9 @@ export default function Home() {
                   V2023 ve üzeri ({segmentCounts.v2023.toLocaleString()})
                 </span>
               </div>
+              <p className="text-xs text-gray-500 ml-6">
+                Allplan Müşteri Veritabanı&apos;ndan V2023, V2024, V2025 sürümleri kullanan aktif müşteriler
+              </p>
             </label>
           </div>
         </div>
@@ -429,7 +440,7 @@ export default function Home() {
                   Bu müşteriler sistem içinde işlenmiş ve CRM süreçlerine dahil edilmiştir.
                 </p>
                 <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                  <strong>Veri Kalitesi:</strong> Dynamics 365'te toplam 1,202 kontak bulunmaktadır. 
+                  <strong>Veri Kalitesi:</strong> Dynamics 365&apos;te toplam 1,202 kontak bulunmaktadır. 
                   157 kayıt boş email adresine sahip, 13 kayıt geçersiz email formatında olduğu için filtrelenmiştir. 
                   Sonuç olarak %85.9 veri kalitesiyle 1,032 geçerli kontak sisteme alınmıştır.
                 </div>
@@ -440,6 +451,45 @@ export default function Home() {
                 </div>
                 <div className="text-xs text-gray-500">
                   Aktif Müşteri
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* V2022 Virtual Segment Özeti */}
+        {(filters.segments.v2022 && 
+          !filters.segments.mevcutMusteriler && 
+          !filters.segments.potansiyelMusteriler && 
+          !filters.segments.salesHubMevcut && 
+          !filters.segments.v2023) && (
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg shadow-sm p-6 mb-6 border border-orange-200">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-gray-900 mb-1">
+                  🕐 V2022 ve Eski Müşteriler
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Görüntülenen <strong>{filteredData.length.toLocaleString()} kayıt</strong> V2022 ve öncesi dönemde Allplan kullanan müşterilerdir.
+                  Bu müşteriler mevcut segmentlerini korur ve virtual olarak V2022 kategorisinde gösterilir.
+                </p>
+                <div className="mt-2 text-xs text-orange-600 bg-orange-50 p-2 rounded">
+                  <strong>Virtual Segment:</strong> Bu müşteriler fiziksel olarak segment değiştirmez. 
+                  V2022 dosyasında bulunan 800 email adresine göre mevcut müşteriler arasından filtrelenir. 
+                  Çoğu Sales Hub Mevcut ve Mevcut Müşteriler segmentlerinde bulunur.
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-orange-600">
+                  {filteredData.length.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-500">
+                  V2022 Müşteri
                 </div>
               </div>
             </div>
@@ -469,7 +519,7 @@ export default function Home() {
               {filteredCounts.mevcutMusteriler.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              %100 şirket bilgisi
+              %{companyStats.companyPercentage} şirket bilgisi
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -496,7 +546,7 @@ export default function Home() {
               Dynamics 365 kaynak
             </p>
             <p className="text-xs text-blue-600 mt-1 font-medium">
-              Not: Dynamics'te 1,202 kontak • 157 boş email + 13 geçersiz format filtrelendi
+              Not: Dynamics&apos;te 1,202 kontak • 157 boş email + 13 geçersiz format filtrelendi
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -506,6 +556,9 @@ export default function Home() {
             </div>
             <p className="text-2xl font-bold text-gray-900">
               {filteredCounts.v2022.toLocaleString()}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Virtual segment • Mevcut segmentler korunur
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
@@ -549,9 +602,7 @@ export default function Home() {
               Seçilen filtrede kayıt bulunamadı
             </h3>
             <p className="text-gray-600 mb-4">
-              {(filters.segments.v2022 || filters.segments.v2023) ? 
-                'V2022 ve V2023 segmentleri henüz sisteme eklenmemiştir. Bu segmentler gelecekte entegre edilecektir.' :
-                'Arama kriterlerinize uygun kayıt bulunamadı. Lütfen filtreleri kontrol edin.'}
+              Arama kriterlerinize uygun kayıt bulunamadı. Lütfen filtreleri kontrol edin.
             </p>
             <button
               onClick={() => setFilters({
@@ -803,10 +854,10 @@ export default function Home() {
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">📊 Spam Tespit Yöntemleri</h3>
                   <div className="space-y-2 text-sm text-gray-700">
                     <div><strong>Geçici Email Servisleri:</strong> 10minutemail, tempmail, guerrillamail, mailinator vb.</div>
-                    <div><strong>Spam Domain'ler:</strong> Bilinen spam domain'leri tespit eder</div>
-                    <div><strong>Şüpheli Pattern'ler:</strong> "temp", "disposable", "fake" içeren domain'ler</div>
-                    <div><strong>Karakter Analizi:</strong> Çok sayıda rakam içeren şüpheli email'ler</div>
-                    <div><strong>Typo Domain'ler:</strong> gmial.com, yahooo.com gibi hatalı yazımlar</div>
+                    <div><strong>Spam Domain&apos;ler:</strong> Bilinen spam domain&apos;leri tespit eder</div>
+                    <div><strong>Şüpheli Pattern&apos;ler:</strong> &quot;temp&quot;, &quot;disposable&quot;, &quot;fake&quot; içeren domain&apos;ler</div>
+                    <div><strong>Karakter Analizi:</strong> Çok sayıda rakam içeren şüpheli email&apos;ler</div>
+                    <div><strong>Typo Domain&apos;ler:</strong> gmial.com, yahooo.com gibi hatalı yazımlar</div>
                   </div>
                 </div>
 
@@ -816,7 +867,7 @@ export default function Home() {
                   <div className="space-y-2 text-sm text-gray-700">
                     <div><strong>Spam E-mail:</strong> Mor renkte, tıklanabilir kart</div>
                     <div><strong>Gerçek Zamanlı Sayım:</strong> Spam email sayısını gösterir</div>
-                    <div><strong>Filtreleme:</strong> Tıklandığında sadece spam email'leri listeler</div>
+                    <div><strong>Filtreleme:</strong> Tıklandığında sadece spam email&apos;leri listeler</div>
                   </div>
                 </div>
 
@@ -827,7 +878,7 @@ export default function Home() {
                     <div><strong>Kombine Filtreleme:</strong> Diğer kalite filtreleri ile kombine edilebilir</div>
                     <div><strong>Segment Uyumu:</strong> Segment filtreleri ile birlikte çalışır</div>
                     <div><strong>Arama Entegrasyonu:</strong> Arama ile kombine edilebilir</div>
-                    <div><strong>Görsel Geri Bildirim:</strong> "Spam E-mail" badge'i ile aktif filtre gösterilir</div>
+                    <div><strong>Görsel Geri Bildirim:</strong> &quot;Spam E-mail&quot; badge&apos;i ile aktif filtre gösterilir</div>
                   </div>
                 </div>
 
