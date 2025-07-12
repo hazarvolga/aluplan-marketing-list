@@ -8,6 +8,7 @@ import LoginForm from '@/components/LoginForm';
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [currentUser, setCurrentUser] = useState<string>('');
   const [data, setData] = useState<MarketingData[]>([]);
   const [filteredData, setFilteredData] = useState<MarketingData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,6 +40,7 @@ export default function Home() {
     const checkAuth = () => {
       const isAuth = localStorage.getItem('aluplan_authenticated') === 'true';
       const loginTime = localStorage.getItem('aluplan_login_time');
+      const user = localStorage.getItem('aluplan_user');
       
       // Check if session expired (24 hours)
       if (isAuth && loginTime) {
@@ -54,6 +56,7 @@ export default function Home() {
       }
       
       setIsAuthenticated(isAuth);
+      setCurrentUser(user || '');
       setIsCheckingAuth(false);
     };
     
@@ -163,6 +166,7 @@ export default function Home() {
     localStorage.removeItem('aluplan_user');
     localStorage.removeItem('aluplan_login_time');
     setIsAuthenticated(false);
+    setCurrentUser('');
     setData([]);
     setFilteredData([]);
   };
@@ -313,13 +317,20 @@ export default function Home() {
                 Marketing verilerinizi filtreleyin ve analiz edin
               </p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              Çıkış Yap
-            </button>
+            <div className="flex items-center gap-4">
+              {currentUser && (
+                <span className="text-sm text-gray-600">
+                  Kullanıcı: <span className="font-semibold">{currentUser}</span>
+                </span>
+              )}
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Çıkış Yap
+              </button>
+            </div>
           </div>
         </div>
 
