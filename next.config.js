@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Production build optimizations
-  output: 'standalone',
-  
   // Plesk compatibility
   trailingSlash: true,
   
