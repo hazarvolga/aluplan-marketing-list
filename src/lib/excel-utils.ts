@@ -13,6 +13,10 @@ export interface MarketingData {
   isSalesHubMevcut: boolean;
   spamScore: number;
   spamReason: string;
+  nameSpamScore: number;
+  nameSpamReason: string;
+  companySpamScore: number;
+  companySpamReason: string;
 }
 
 export interface FilterOptions {
@@ -32,36 +36,56 @@ export function processExcelData(buffer: ArrayBuffer): MarketingData[] {
   const rawData = XLSX.utils.sheet_to_json(worksheet);
 
   return rawData.map((row: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const segment = String(row.segment || '').toLowerCase();
-    const email = String(row.email || '');
-    const spamCheck = checkSpamEmail(email);
+    // Yeni veri yapısından alanları oku
+    const email = String(row['Main E-Mail'] || '');
+    const name = String(row['Name'] || '');
+    const company = String(row['Acount Name'] || '');
+    const displayCategory = String(row.display_category || '');
     
-    // İşlenme durumunu belirle
+    // Spam kontrolleri
+    const spamCheck = checkSpamEmail(email);
+    const nameSpamCheck = checkSpamContent(name);
+    const companySpamCheck = checkSpamContent(company);
+    
+    // Boolean alanları oku
+    const isDnc = Boolean(row.is_dnc);
+    const isSalesHub = Boolean(row.is_sales_hub);
+    const isMevcut = Boolean(row.is_mevcut);
+    const isPotansiyel = Boolean(row.is_potansiyel);
+    
+    // İşlenme durumunu yeni sisteme göre belirle
     let processingStatus: 'Sales Hub İşlenmiş' | 'Sales Hub İşlenmemiş' | 'Potansiyel' | 'Diğer';
-    const segmentLower = segment.toLowerCase();
-    if (segmentLower.includes('sales hub mevcut')) {
+    if (isDnc) {
+      processingStatus = 'Diğer';
+    } else if (isSalesHub && isMevcut) {
       processingStatus = 'Sales Hub İşlenmiş';
-    } else if (segmentLower.includes('mevcut müşteriler')) {
+    } else if (isSalesHub) {
       processingStatus = 'Sales Hub İşlenmemiş';
-    } else if (segmentLower.includes('potansiyel müşteriler') || segmentLower.includes('mautic')) {
+    } else if (isPotansiyel) {
       processingStatus = 'Potansiyel';
+    } else if (isMevcut) {
+      processingStatus = 'Sales Hub İşlenmemiş';
     } else {
       processingStatus = 'Diğer';
     }
     
     return {
-      name: String(row.name || ''),
+      name: name,
       email: email,
-      company: String(row.company || ''),
-      phone: String(row.phone || ''),
-      segment: String(row.segment || ''),
-      license: String(row.license || ''),
+      company: company,
+      phone: String(row['Phone Number'] || ''),
+      segment: displayCategory,
+      license: String(row['Kalıcı/SUB/SSA'] || ''),
       processingStatus: processingStatus,
-      isMevcutMusteriler: segmentLower.includes('mevcut müşteriler') || segmentLower === 'mevcut müşteriler' || segmentLower.includes('sales hub mevcut'),
-      isPotansiyelMusteriler: segmentLower.includes('mautic') || segmentLower === 'mautic' || segmentLower.includes('potansiyel müşteriler'),
-      isSalesHubMevcut: segmentLower.includes('sales hub'),
+      isMevcutMusteriler: isMevcut,
+      isPotansiyelMusteriler: isPotansiyel,
+      isSalesHubMevcut: isSalesHub,
       spamScore: spamCheck.score,
       spamReason: spamCheck.reason,
+      nameSpamScore: nameSpamCheck.score,
+      nameSpamReason: nameSpamCheck.reason,
+      companySpamScore: companySpamCheck.score,
+      companySpamReason: companySpamCheck.reason,
     };
   });
 }
@@ -172,7 +196,9 @@ export function getDataQualityStats(data: MarketingData[]): DataQualityStats {
     const isInvalidEmail = !item.email || !emailRegex.test(item.email);
     const isEmptyName = !item.name || item.name.trim() === '';
     const spamResult = checkSpamEmail(item.email);
-    const isSpam = spamResult.isSpam;
+    const nameSpamResult = checkSpamContent(item.name);
+    const companySpamResult = checkSpamContent(item.company);
+    const isSpam = spamResult.isSpam || nameSpamResult.isSpam || companySpamResult.isSpam;
     
     // Priority order: duplicate > invalid > empty name > spam > valid
     if (isDuplicate) {
@@ -439,4 +465,117 @@ export function getLicenseCounts(data: MarketingData[]): Record<string, number> 
   });
   
   return counts;
+}
+
+// Spam content detection for name and company fields
+export function checkSpamContent(text: string): SpamCheckResult {
+  if (!text || text.trim() === '') {
+    return { isSpam: false, reason: '', email: text, score: 0 };
+  }
+  
+  const textLower = text.toLowerCase();
+  let score = 0;
+  const reasons: string[] = [];
+  
+  // High-risk spam patterns (immediate flag)
+  const highRiskPatterns = [
+    /you\s+got\s+\d+.*\$+/i,                   // "You got 44 913 $$$"
+    /withdraw.*https?:\/\//i,                  // "Withdraw > https://"
+    /forms\.yandex\.com/i,                     // Yandex forms (often spam)
+    /\$+.*withdraw/i,                          // $$$ withdraw combinations
+    /📕.*📕/,                                   // Emoji spam pattern
+    /\d{5,}.*\$+/,                             // Large numbers with $$$
+    /click.*here.*\$+/i,                       // Click here $$$ patterns
+    /congratulations.*won.*\$/i,               // Congratulations you won $ spam
+    /urgent.*money.*transfer/i,                // Money transfer spam
+    /bitcoin.*wallet/i,                        // Bitcoin spam
+    /cryptocurrency.*investment/i,             // Crypto spam
+  ];
+  
+  for (const pattern of highRiskPatterns) {
+    if (pattern.test(text)) {
+      return { isSpam: true, reason: 'Spam mesaj içeriği', email: text, score: 100 };
+    }
+  }
+  
+  // Medium-risk patterns (suspicious content)
+  const mediumRiskPatterns = [
+    /free.*money/i,
+    /make.*\$.*online/i,
+    /guaranteed.*income/i,
+    /work.*from.*home.*\$/i,
+    /earn.*\$.*daily/i,
+    /investment.*return/i,
+    /lottery.*winner/i,
+    /claim.*prize/i,
+    /limited.*time.*offer.*\$/i,
+    /exclusive.*deal.*\$/i,
+  ];
+  
+  for (const pattern of mediumRiskPatterns) {
+    if (pattern.test(text)) {
+      score = Math.max(score, 75);
+      reasons.push('Şüpheli içerik');
+    }
+  }
+  
+  // Suspicious URLs
+  const suspiciousUrlPatterns = [
+    /bit\.ly/i,
+    /tinyurl/i,
+    /shortened\.link/i,
+    /forms\./i,
+    /survey\./i,
+    /claim\./i,
+  ];
+  
+  for (const pattern of suspiciousUrlPatterns) {
+    if (pattern.test(text)) {
+      score = Math.max(score, 60);
+      reasons.push('Şüpheli URL');
+    }
+  }
+  
+  // Excessive special characters
+  const specialCharCount = (text.match(/[!@#$%^&*()_+={}\[\]|\\:";'<>?,./~`]/g) || []).length;
+  const specialCharRatio = specialCharCount / text.length;
+  
+  if (specialCharRatio > 0.3) {
+    score = Math.max(score, 50);
+    reasons.push('Çok fazla özel karakter');
+  }
+  
+  // Excessive emojis
+  const emojiCount = (text.match(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu) || []).length;
+  const emojiRatio = emojiCount / text.length;
+  
+  if (emojiRatio > 0.1) {
+    score = Math.max(score, 40);
+    reasons.push('Çok fazla emoji');
+  }
+  
+  // Very long text (potential spam)
+  if (text.length > 200) {
+    score = Math.max(score, 30);
+    reasons.push('Çok uzun metin');
+  }
+  
+  // Multiple URLs
+  const urlCount = (text.match(/https?:\/\/[^\s]+/g) || []).length;
+  if (urlCount > 1) {
+    score = Math.max(score, 50);
+    reasons.push('Çoklu URL');
+  }
+  
+  // Repeated characters
+  const repeatedChars = /(.)\1{4,}/g;
+  if (repeatedChars.test(text)) {
+    score = Math.max(score, 30);
+    reasons.push('Tekrarlanan karakter');
+  }
+  
+  const isSpam = score >= 70;
+  const reason = reasons.length > 0 ? reasons.join(', ') : '';
+  
+  return { isSpam, reason, email: text, score };
 }

@@ -471,7 +471,7 @@ export default function Home() {
                 </span>
               </div>
               <div className="ml-6 text-xs text-gray-500">
-                Dynamics 365 + Allplan Final dosyalarından alınan tüm müşteri verileri
+                Tüm mevcut müşteri verileri (Dynamics 365 + Allplan)
               </div>
             </label>
             <label className="flex flex-col space-y-1">
@@ -487,7 +487,7 @@ export default function Home() {
                 </span>
               </div>
               <div className="ml-6 text-xs text-gray-500">
-                mautic-tum-liste.xlsx dosyasından alınan veriler
+                Sadece Mautic'ten gelen potansiyel müşteriler
               </div>
             </label>
             <label className="flex flex-col space-y-1">
@@ -499,11 +499,11 @@ export default function Home() {
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm font-semibold text-gray-800">
-                  Sales Hub Mevcut ({segmentCounts.salesHubMevcut.toLocaleString()})
+                  Sales Hub ({segmentCounts.salesHubMevcut.toLocaleString()})
                 </span>
               </div>
               <div className="ml-6 text-xs text-gray-500">
-                Dynamics 365 sistemindeki aktif müşteriler
+                Aktif satış sürecindeki müşteriler
               </div>
             </label>
           </div>
