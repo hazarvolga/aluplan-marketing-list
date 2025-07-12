@@ -34,8 +34,7 @@ const nextConfig = {
   
   // Experimental features
   experimental: {
-    // Enable for better performance
-    optimizeCss: true,
+    // Enable for better performance  
   },
 }
 
