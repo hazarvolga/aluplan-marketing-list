@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { processExcelData } from '@/lib/excel-utils';
+import { processExcelData } from '../../../lib/excel-utils';
 import * as fs from 'fs';
 import * as path from 'path';
 

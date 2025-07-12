@@ -1,0 +1,97 @@
+{
+  "test_date": "2025-07-12T01:40:06.698490",
+  "total_tests": 37,
+  "vulnerabilities_found": 13,
+  "vulnerabilities": [
+    {
+      "email": "test@example.com",
+      "vulnerability": "Test/example domain'ler spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@test.com",
+      "vulnerability": "Test/example domain'ler spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test..test@domain.com",
+      "vulnerability": "Double dot formatı spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@domain.",
+      "vulnerability": "Eksik domain formatı spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@domain..com",
+      "vulnerability": "Double dot formatı spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@domain.com<script>alert('xss')</script>",
+      "vulnerability": "Injection attempt spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@domain.com'; DROP TABLE users; --",
+      "vulnerability": "Injection attempt spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@domain.com\u0000null",
+      "vulnerability": "Injection attempt spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com",
+      "vulnerability": "Çok uzun domain spam olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@domain.com",
+      "vulnerability": "Çok uzun local part spam olarak işaretlenmeli",
+      "score": 25,
+      "reason": "Rastgele karakter"
+    },
+    {
+      "email": "test@subdomain.10minutemail.com",
+      "vulnerability": "Subdomain bypass korunmalı",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@192.168.1.1",
+      "vulnerability": "IP address formatı şüpheli olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    },
+    {
+      "email": "test@[192.168.1.1]",
+      "vulnerability": "IP address formatı şüpheli olarak işaretlenmeli",
+      "score": 0,
+      "reason": "Geçerli email"
+    }
+  ],
+  "recommendations": [
+    "1. Test/example domain'leri spam listesine ekle",
+    "2. IP address formatlarını kontrol et",
+    "3. Double dot ve eksik domain kontrolü ekle",
+    "4. Injection attempt kontrolü ekle",
+    "5. Subdomain bypass koruması ekle",
+    "6. Çok uzun email kontrolü ekle",
+    "7. Unicode karakter kontrolü ekle",
+    "8. CRLF/Tab karakteri kontrolü ekle",
+    "9. Null byte kontrolü ekle",
+    "10. Minimum spam score'u 30'a çıkar"
+  ]
+}

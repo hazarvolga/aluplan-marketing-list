@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Upload, Search, Download, Filter, BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
-import { MarketingData, FilterOptions, processExcelData, filterData, getSegmentCounts, exportToCSV, getDataQualityStats, checkSpamEmail, getCompanyStats, removeDuplicateEmails, getDuplicateEmailInfo } from '@/lib/excel-utils';
-// import { cn } from '@/lib/utils';
+import { Upload, Search, Download, Filter, BarChart3, ChevronUp, ChevronDown, LogOut } from 'lucide-react';
+import { MarketingData, FilterOptions, processExcelData, filterData, getSegmentCounts, exportToCSV, getDataQualityStats, checkSpamEmail, removeDuplicateEmails, getDuplicateEmailInfo, getUniqueLicenses } from '@/lib/excel-utils';
+import LoginForm from '@/components/LoginForm';
 
 export default function Home() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [data, setData] = useState<MarketingData[]>([]);
   const [filteredData, setFilteredData] = useState<MarketingData[]>([]);
   const [loading, setLoading] = useState(false);
   const [qualityFilter, setQualityFilter] = useState<string | null>(null);
   const [displayCount, setDisplayCount] = useState(100);
-  const [showPhone, setShowPhone] = useState(false);
+  // const [showPhone, setShowPhone] = useState(false); // Telefon sütunu geçici olarak gizlendi
   const [showSpamModal, setShowSpamModal] = useState(false);
   const [sortConfig, setSortConfig] = useState<{
     key: keyof MarketingData | null;
@@ -25,16 +27,45 @@ export default function Home() {
       mevcutMusteriler: false,
       potansiyelMusteriler: false,
       salesHubMevcut: false,
-      v2022: false,
-      v2023: false,
     },
     searchTerm: '',
+    licenses: [],
   });
+  const [licenseSearch, setLicenseSearch] = useState('');
+  const [showLicenseDropdown, setShowLicenseDropdown] = useState(false);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const checkAuth = () => {
+      const isAuth = localStorage.getItem('aluplan_authenticated') === 'true';
+      const loginTime = localStorage.getItem('aluplan_login_time');
+      
+      // Check if session expired (24 hours)
+      if (isAuth && loginTime) {
+        const now = Date.now();
+        const loginTimestamp = parseInt(loginTime);
+        const sessionDuration = 24 * 60 * 60 * 1000; // 24 hours
+        
+        if (now - loginTimestamp > sessionDuration) {
+          // Session expired
+          handleLogout();
+          return;
+        }
+      }
+      
+      setIsAuthenticated(isAuth);
+      setIsCheckingAuth(false);
+    };
+    
+    checkAuth();
+  }, []);
 
   // Load default data on component mount
   useEffect(() => {
-    loadDefaultData();
-  }, []);
+    if (isAuthenticated) {
+      loadDefaultData();
+    }
+  }, [isAuthenticated]);
 
   // Filter data when filters change
   useEffect(() => {
@@ -50,14 +81,41 @@ export default function Home() {
             acc[email] = (acc[email] || 0) + 1;
             return acc;
           }, {} as Record<string, number>);
-          const duplicateEmailList = Object.keys(emailCounts).filter(email => emailCounts[email] > 1);
-          filtered = filtered.filter(item => duplicateEmailList.includes(item.email));
+          // Show ALL records that have duplicate emails (not just unique emails)
+          filtered = filtered.filter(item => emailCounts[item.email] > 1);
           break;
         case 'invalidEmails':
-          filtered = filtered.filter(item => item.email && !emailRegex.test(item.email));
+          // Filter with priority order: only records that are in "invalid emails" category
+          filtered = filtered.filter(item => {
+            const emails = data.map(d => d.email).filter(email => email);
+            const emailCounts = emails.reduce((acc, email) => {
+              acc[email] = (acc[email] || 0) + 1;
+              return acc;
+            }, {} as Record<string, number>);
+            
+            const isDuplicate = emailCounts[item.email] > 1;
+            const isInvalidEmail = !item.email || !emailRegex.test(item.email);
+            
+            // Priority: duplicate > invalid
+            return !isDuplicate && isInvalidEmail;
+          });
           break;
         case 'emptyNames':
-          filtered = filtered.filter(item => !item.name.trim());
+          // Filter with priority order: only records that are in "empty names" category
+          filtered = filtered.filter(item => {
+            const emails = data.map(d => d.email).filter(email => email);
+            const emailCounts = emails.reduce((acc, email) => {
+              acc[email] = (acc[email] || 0) + 1;
+              return acc;
+            }, {} as Record<string, number>);
+            
+            const isDuplicate = emailCounts[item.email] > 1;
+            const isInvalidEmail = !item.email || !emailRegex.test(item.email);
+            const isEmptyName = !item.name.trim();
+            
+            // Priority: duplicate > invalid > empty name
+            return !isDuplicate && !isInvalidEmail && isEmptyName;
+          });
           break;
         case 'emptyCompanies':
           filtered = filtered.filter(item => !item.company.trim());
@@ -70,10 +128,22 @@ export default function Home() {
           );
           break;
         case 'spamEmails':
+          // Filter with priority order: only records that are in "spam emails" category
           filtered = filtered.filter(item => {
-            if (!item.email) return false;
+            const emails = data.map(d => d.email).filter(email => email);
+            const emailCounts = emails.reduce((acc, email) => {
+              acc[email] = (acc[email] || 0) + 1;
+              return acc;
+            }, {} as Record<string, number>);
+            
+            const isDuplicate = emailCounts[item.email] > 1;
+            const isInvalidEmail = !item.email || !emailRegex.test(item.email);
+            const isEmptyName = !item.name.trim();
             const spamCheck = checkSpamEmail(item.email);
-            return spamCheck.isSpam;
+            const isSpam = spamCheck.isSpam;
+            
+            // Priority: duplicate > invalid > empty name > spam
+            return !isDuplicate && !isInvalidEmail && !isEmptyName && isSpam;
           });
           break;
       }
@@ -83,11 +153,33 @@ export default function Home() {
     setDisplayCount(100); // Reset display count when filters change
   }, [data, filters, qualityFilter]);
 
+  // Authentication functions
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('aluplan_authenticated');
+    localStorage.removeItem('aluplan_user');
+    localStorage.removeItem('aluplan_login_time');
+    setIsAuthenticated(false);
+    setData([]);
+    setFilteredData([]);
+  };
+
   const loadDefaultData = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/load-data');
-      const result = await response.json();
+      const response = await fetch('/api/load-data/');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const text = await response.text();
+      console.log('API Response:', text);
+      
+      const result = JSON.parse(text);
       if (result.success) {
         setData(result.data);
       }
@@ -148,10 +240,9 @@ export default function Home() {
         mevcutMusteriler: false,
         potansiyelMusteriler: false,
         salesHubMevcut: false,
-        v2022: false,
-        v2023: false,
       },
       searchTerm: '',
+      licenses: [],
     });
     setQualityFilter(null);
     setDisplayCount(100);
@@ -189,39 +280,47 @@ export default function Home() {
   }, [filteredData, sortConfig]);
 
   const segmentCounts = getSegmentCounts(data);
-  const filteredCounts = getSegmentCounts(filteredData);
   const qualityStats = getDataQualityStats(data);
-  const companyStats = getCompanyStats(data);
-  
-  // Aktif filtrelere göre sayımları hesapla
-  const getActiveFilterCounts = () => {
-    const hasActiveFilters = Object.values(filters.segments).some(Boolean);
-    if (!hasActiveFilters) {
-      return {
-        total: 0,
-        mevcutMusteriler: 0,
-        potansiyelMusteriler: 0,
-        salesHubMevcut: 0,
-        v2022: 0,
-        v2023: 0,
-      };
-    }
-    return filteredCounts;
-  };
-  
-  const activeFilterCounts = getActiveFilterCounts();
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Sistem kontrol ediliyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login form if not authenticated
+  if (!isAuthenticated) {
+    return <LoginForm onLogin={handleLogin} />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Aluplan Marketing Data Filter
-          </h1>
-          <p className="text-gray-600">
-            Marketing verilerinizi filtreleyin ve analiz edin
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Aluplan Marketing Data Filter
+              </h1>
+              <p className="text-gray-600">
+                Marketing verilerinizi filtreleyin ve analiz edin
+              </p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Çıkış Yap
+            </button>
+          </div>
         </div>
 
         {/* Data Quality Info */}
@@ -358,7 +457,7 @@ export default function Home() {
           </div>
 
           {/* Segment Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <label className="flex flex-col space-y-1">
               <div className="flex items-center space-x-2">
                 <input
@@ -404,229 +503,101 @@ export default function Home() {
                 </span>
               </div>
               <div className="ml-6 text-xs text-gray-500">
-                Dynamics 365 sistemindeki aktif müşteriler (V2022/V2023 virtual segment toplamından büyüktür - normal durum)
+                Dynamics 365 sistemindeki aktif müşteriler
               </div>
             </label>
-            <label className="flex flex-col space-y-1">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={filters.segments.v2022}
-                  onChange={() => handleSegmentFilterChange('v2022')}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm font-semibold text-gray-800">
-                  V2022 ve eski ({segmentCounts.v2022.toLocaleString()})
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 ml-6">
-                Email bazlı eşleştirme ile V2022 ve daha eski sürümleri kullanan müşteriler
-              </p>
+          </div>
+          
+          {/* Lisans Filtreleme */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Lisans Filtreleme (Autocomplete)
             </label>
-            <label className="flex flex-col space-y-1">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={filters.segments.v2023}
-                  onChange={() => handleSegmentFilterChange('v2023')}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm font-semibold text-gray-800">
-                  V2023 ve üzeri ({segmentCounts.v2023.toLocaleString()})
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 ml-6">
-                Allplan Müşteri Veritabanı&apos;ndan V2023, V2024, V2025 sürümleri kullanan aktif müşteriler
-              </p>
-            </label>
-          </div>
-        </div>
-
-        {/* Sales Hub Özet Bilgisi - Sadece Sales Hub Mevcut filtresi seçildiğinde göster */}
-        {filters.segments.salesHubMevcut && (
-          <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg shadow-sm p-4 mb-6 border border-blue-200">
-            <div className="flex items-center gap-3">
-              <div className="text-blue-600">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900 mb-1">
-                  📊 Sales Hub Mevcut Özeti
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Görüntülenen <strong>{filteredData.length.toLocaleString()} kayıt</strong> Dynamics 365 Sales Hub sisteminde aktif olarak takip edilen müşterilerdir.
-                  Bu müşteriler sistem içinde işlenmiş ve CRM süreçlerine dahil edilmiştir.
-                </p>
-                <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                  <strong>Veri Kalitesi:</strong> Dynamics 365&apos;te toplam 1,202 kontak bulunmaktadır. 
-                  157 kayıt boş email adresine sahip, 13 kayıt geçersiz email formatında olduğu için filtrelenmiştir. 
-                  Sonuç olarak %85.9 veri kalitesiyle 1,032 geçerli kontak sisteme alınmıştır.
+            <div className="relative">
+              <input
+                type="text"
+                value={licenseSearch}
+                placeholder="Lisans ara... (örn: SSA-12, V2023)"
+                className="w-full p-3 border-2 border-gray-300 rounded-lg bg-white text-sm text-gray-800 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                onFocus={() => setShowLicenseDropdown(true)}
+                onChange={(e) => {
+                  setLicenseSearch(e.target.value);
+                  setShowLicenseDropdown(true);
+                }}
+                onBlur={() => setTimeout(() => setShowLicenseDropdown(false), 200)}
+              />
+              
+              {/* Autocomplete dropdown */}
+              {showLicenseDropdown && licenseSearch && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  {getUniqueLicenses(data)
+                    .filter(license => 
+                      license.toLowerCase().includes(licenseSearch.toLowerCase()) &&
+                      !filters.licenses.includes(license)
+                    )
+                    .slice(0, 10)
+                    .map(license => (
+                      <button
+                        key={license}
+                        className="w-full px-3 py-2 text-left hover:bg-blue-50 text-sm border-b border-gray-100 last:border-b-0 transition-colors"
+                        onClick={() => {
+                          setFilters(prev => ({
+                            ...prev,
+                            licenses: [...prev.licenses, license]
+                          }));
+                          setLicenseSearch('');
+                          setShowLicenseDropdown(false);
+                        }}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-800 font-medium">{license}</span>
+                          <span className="text-blue-600 text-xs bg-blue-100 px-2 py-1 rounded-full">
+                            {data.filter(item => item.license === license).length} kayıt
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  {getUniqueLicenses(data)
+                    .filter(license => 
+                      license.toLowerCase().includes(licenseSearch.toLowerCase()) &&
+                      !filters.licenses.includes(license)
+                    ).length === 0 && (
+                    <div className="px-3 py-2 text-gray-600 text-sm">
+                      🔍 Eşleşen lisans bulunamadı
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-green-600">
-                  {filteredData.length.toLocaleString()}
+              )}
+              
+              {/* Seçili lisansları göster */}
+              {filters.licenses.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {filters.licenses.map(license => (
+                    <span key={license} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm">
+                      {license} 
+                      <span className="ml-1 text-blue-200">
+                        ({data.filter(item => item.license === license).length})
+                      </span>
+                      <button
+                        onClick={() => {
+                          setFilters(prev => ({
+                            ...prev,
+                            licenses: prev.licenses.filter(l => l !== license)
+                          }));
+                        }}
+                        className="ml-2 text-blue-200 hover:text-white bg-blue-500 hover:bg-blue-700 rounded-full w-4 h-4 flex items-center justify-center text-xs transition-colors"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
                 </div>
-                <div className="text-xs text-gray-500">
-                  Aktif Müşteri
-                </div>
-              </div>
+              )}
             </div>
-          </div>
-        )}
-
-        {/* V2022 Virtual Segment Özeti */}
-        {(filters.segments.v2022 && 
-          !filters.segments.mevcutMusteriler && 
-          !filters.segments.potansiyelMusteriler && 
-          !filters.segments.salesHubMevcut && 
-          !filters.segments.v2023) && (
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg shadow-sm p-6 mb-6 border border-orange-200">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900 mb-1">
-                  🕐 V2022 ve Eski Müşteriler
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Görüntülenen <strong>{filteredData.length.toLocaleString()} kayıt</strong> V2022 ve öncesi dönemde Allplan kullanan müşterilerdir.
-                  Bu müşteriler mevcut segmentlerini korur ve virtual olarak V2022 kategorisinde gösterilir.
-                </p>
-                <div className="mt-2 text-xs text-orange-600 bg-orange-50 p-2 rounded">
-                  <strong>Virtual Segment:</strong> Bu müşteriler fiziksel olarak segment değiştirmez. 
-                  V2022 dosyasında bulunan 800 email adresine göre mevcut müşteriler arasından filtrelenir. 
-                  Çoğu Sales Hub Mevcut ve Mevcut Müşteriler segmentlerinde bulunur.
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-orange-600">
-                  {filteredData.length.toLocaleString()}
-                </div>
-                <div className="text-xs text-gray-500">
-                  V2022 Müşteri
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* V2023 Virtual Segment Özeti */}
-        {(filters.segments.v2023 && 
-          !filters.segments.mevcutMusteriler && 
-          !filters.segments.potansiyelMusteriler && 
-          !filters.segments.salesHubMevcut && 
-          !filters.segments.v2022) && (
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm p-6 mb-6 border border-green-200">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900 mb-1">
-                  ⚡ V2023 ve Üzeri Müşteriler
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Görüntülenen <strong>{filteredData.length.toLocaleString()} kayıt</strong> V2023, V2024, V2025 sürümleri kullanan aktif müşterilerdir.
-                  Bu müşteriler en güncel Allplan teknolojisini kullanmakta ve yüksek aktivite seviyesine sahiptir.
-                </p>
-                <div className="mt-2 text-xs text-green-600 bg-green-50 p-2 rounded">
-                  <strong>Aktif Segment:</strong> Bu müşteriler Allplan Müşteri Veritabanı'ndan V2023 ve üzeri sürümleri kullanan aktif müşterilerdir. 
-                  Modern teknoloji kullanıcıları olup, upgrade potansiyeli yüksek müşteri grubudur. 
-                  Çoğu Sales Hub Mevcut ve Mevcut Müşteriler segmentlerinde bulunur.
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-green-600">
-                  {filteredData.length.toLocaleString()}
-                </div>
-                <div className="text-xs text-gray-500">
-                  V2023+ Müşteri
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-medium text-gray-600">Toplam</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {activeFilterCounts.total.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              5 kaynak birleştirildi
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 bg-blue-500 rounded"></div>
-              <span className="text-sm font-medium text-gray-600">Mevcut Müşteriler</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {activeFilterCounts.mevcutMusteriler.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              %{companyStats.companyPercentage} şirket bilgisi
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-sm font-medium text-gray-600">Potansiyel Müşteriler</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {activeFilterCounts.potansiyelMusteriler.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Mautic kaynak
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-              <span className="text-sm font-medium text-gray-600">Sales Hub</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {activeFilterCounts.salesHubMevcut.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Dynamics 365 kaynak
-            </p>
-            <p className="text-xs text-blue-600 mt-1 font-medium">
-              Not: Dynamics&apos;te 1,202 kontak • 157 boş email + 13 geçersiz format filtrelendi
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 bg-orange-500 rounded"></div>
-              <span className="text-sm font-medium text-gray-600">V2022</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {activeFilterCounts.v2022.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Virtual segment • Mevcut segmentler korunur
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 bg-purple-500 rounded"></div>
-              <span className="text-sm font-medium text-gray-600">V2023</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {activeFilterCounts.v2023.toLocaleString()}
+            <p className="text-sm text-gray-700 mt-2 font-medium">
+              {filters.licenses.length > 0 
+                ? `✅ Seçilen ${filters.licenses.length} lisans: ${filters.licenses.join(', ')}` 
+                : '💡 Lisans aramak için yazmaya başlayın (SSA-12, SUB-12, V2023, vb.)'}
             </p>
           </div>
         </div>
@@ -677,15 +648,14 @@ export default function Home() {
               Arama kriterlerinize uygun kayıt bulunamadı. Lütfen filtreleri kontrol edin.
             </p>
             <button
-              onClick={() => setFilters({
+              onClick={() =>              setFilters({
                 searchTerm: '',
                 segments: {
                   mevcutMusteriler: false,
                   potansiyelMusteriler: false,
-                  salesHubMevcut: false,
-                  v2022: false,
-                  v2023: false
-                }
+                  salesHubMevcut: false
+                },
+                licenses: []
               })}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
@@ -699,16 +669,19 @@ export default function Home() {
                 <h3 className="text-lg font-medium text-gray-900">
                   Kayıt Listesi ({filteredData.length.toLocaleString()})
                 </h3>
+                {/* Telefon göster butonu geçici olarak gizlendi
                 <button
                   onClick={() => setShowPhone(!showPhone)}
                   className="inline-flex items-center gap-2 px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   📞 Telefon {showPhone ? 'Gizle' : 'Göster'}
                 </button>
+                */}
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full table-fixed">
+                <colgroup><col className="w-48" /><col className="w-64" /><col className="w-48" /><col className="w-32" /><col className="w-40" /><col className="w-36" /></colgroup>
                 <thead className="bg-gray-50">
                   <tr>
                     <th 
@@ -763,6 +736,7 @@ export default function Home() {
                         )}
                       </div>
                     </th>
+                    {/* Telefon sütunu geçici olarak gizlendi
                     {showPhone && (
                       <th 
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
@@ -778,6 +752,20 @@ export default function Home() {
                         </div>
                       </th>
                     )}
+                    */}
+                    <th 
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => handleSort('license')}
+                    >
+                      <div className="flex items-center gap-2">
+                        Lisans
+                        {sortConfig.key === 'license' && (
+                          sortConfig.direction === 'asc' ? 
+                            <ChevronUp className="w-4 h-4" /> : 
+                            <ChevronDown className="w-4 h-4" />
+                        )}
+                      </div>
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Segment
                     </th>
@@ -799,11 +787,15 @@ export default function Home() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {sortedData.slice(0, displayCount).map((item, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {item.name}
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        <div className="truncate" title={item.name}>
+                          {item.name}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.email}
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        <div className="truncate" title={item.email}>
+                          {item.email}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div className="flex items-center gap-2">
@@ -832,14 +824,21 @@ export default function Home() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.company}
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        <div className="truncate" title={item.company}>
+                          {item.company}
+                        </div>
                       </td>
+                      {/* Telefon sütunu geçici olarak gizlendi
                       {showPhone && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {item.phone}
                         </td>
                       )}
+                      */}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.license || '-'}
+                      </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
                         <div className="flex flex-wrap gap-1">
                           {item.isMevcutMusteriler && (
@@ -855,16 +854,6 @@ export default function Home() {
                           {item.isSalesHubMevcut && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                               Sales Hub
-                            </span>
-                          )}
-                          {item.isV2022 && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                              V2022
-                            </span>
-                          )}
-                          {item.isV2023 && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                              V2023
                             </span>
                           )}
                         </div>

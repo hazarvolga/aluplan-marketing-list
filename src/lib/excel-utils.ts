@@ -1,6 +1,4 @@
 import * as XLSX from 'xlsx';
-import { V2022_EMAILS } from './v2022-emails';
-import { V2023_EMAILS } from '../data/v2023-emails';
 
 export interface MarketingData {
   name: string;
@@ -8,12 +6,11 @@ export interface MarketingData {
   company: string;
   phone: string;
   segment: string;
+  license: string;
   processingStatus: 'Sales Hub İşlenmiş' | 'Sales Hub İşlenmemiş' | 'Potansiyel' | 'Diğer';
   isMevcutMusteriler: boolean;
   isPotansiyelMusteriler: boolean;
   isSalesHubMevcut: boolean;
-  isV2022: boolean;
-  isV2023: boolean;
   spamScore: number;
   spamReason: string;
 }
@@ -23,10 +20,9 @@ export interface FilterOptions {
     mevcutMusteriler: boolean;
     potansiyelMusteriler: boolean;
     salesHubMevcut: boolean;
-    v2022: boolean;
-    v2023: boolean;
   };
   searchTerm: string;
+  licenses: string[]; // Seçili lisans türleri
 }
 
 export function processExcelData(buffer: ArrayBuffer): MarketingData[] {
@@ -47,10 +43,8 @@ export function processExcelData(buffer: ArrayBuffer): MarketingData[] {
       processingStatus = 'Sales Hub İşlenmiş';
     } else if (segmentLower.includes('mevcut müşteriler')) {
       processingStatus = 'Sales Hub İşlenmemiş';
-    } else if (segmentLower.includes('potansiyel müşteriler')) {
+    } else if (segmentLower.includes('potansiyel müşteriler') || segmentLower.includes('mautic')) {
       processingStatus = 'Potansiyel';
-    } else if (segmentLower.includes('v2023') || segmentLower.includes('v2022')) {
-      processingStatus = 'Sales Hub İşlenmiş';
     } else {
       processingStatus = 'Diğer';
     }
@@ -61,12 +55,11 @@ export function processExcelData(buffer: ArrayBuffer): MarketingData[] {
       company: String(row.company || ''),
       phone: String(row.phone || ''),
       segment: String(row.segment || ''),
+      license: String(row.license || ''),
       processingStatus: processingStatus,
-      isMevcutMusteriler: segmentLower.includes('mevcut müşteriler'),
-      isPotansiyelMusteriler: segmentLower.includes('potansiyel müşteriler'),
-      isSalesHubMevcut: segmentLower.includes('sales hub mevcut'),
-      isV2022: segmentLower.includes('v2022') || V2022_EMAILS.has(email.toLowerCase().trim()),
-      isV2023: V2023_EMAILS.has(email.toLowerCase().trim()), // Sadece Allplan Müşteriler Final listesi
+      isMevcutMusteriler: segmentLower.includes('mevcut müşteriler') || segmentLower === 'mevcut müşteriler' || segmentLower.includes('sales hub mevcut'),
+      isPotansiyelMusteriler: segmentLower.includes('mautic') || segmentLower === 'mautic' || segmentLower.includes('potansiyel müşteriler'),
+      isSalesHubMevcut: segmentLower.includes('sales hub'),
       spamScore: spamCheck.score,
       spamReason: spamCheck.reason,
     };
@@ -92,25 +85,38 @@ export function filterData(data: MarketingData[], filters: FilterOptions): Marke
     
     if (!hasActiveFilters) return true;
 
-    return (
-      (segments.mevcutMusteriler && (item.isMevcutMusteriler || item.isSalesHubMevcut)) ||
+    const segmentMatch = (
+      (segments.mevcutMusteriler && item.isMevcutMusteriler) ||
       (segments.potansiyelMusteriler && item.isPotansiyelMusteriler) ||
-      (segments.salesHubMevcut && item.isSalesHubMevcut) ||
-      (segments.v2022 && item.isV2022) ||
-      (segments.v2023 && item.isV2023)
+      (segments.salesHubMevcut && item.isSalesHubMevcut)
     );
+
+    // License filter
+    if (filters.licenses && filters.licenses.length > 0) {
+      const licenseMatch = item.license && filters.licenses.includes(item.license);
+      return segmentMatch && licenseMatch;
+    }
+
+    return segmentMatch;
   });
 }
 
 export function getSegmentCounts(data: MarketingData[]) {
   return {
     total: data.length,
-    mevcutMusteriler: data.filter(item => item.isMevcutMusteriler || item.isSalesHubMevcut).length,
+    mevcutMusteriler: data.filter(item => item.isMevcutMusteriler).length,
     potansiyelMusteriler: data.filter(item => item.isPotansiyelMusteriler).length,
     salesHubMevcut: data.filter(item => item.isSalesHubMevcut).length,
-    v2022: data.filter(item => item.isV2022).length,
-    v2023: data.filter(item => item.isV2023).length,
   };
+}
+
+export function getUniqueLicenses(data: MarketingData[]): string[] {
+  const licenses = data
+    .map(item => item.license)
+    .filter(license => license && license.trim() !== '')
+    .filter((license, index, array) => array.indexOf(license) === index)
+    .sort();
+  return licenses;
 }
 
 export function exportToCSV(data: MarketingData[]): string {
@@ -142,33 +148,48 @@ export interface DataQualityStats {
 }
 
 export function getDataQualityStats(data: MarketingData[]): DataQualityStats {
-  const emails = data.map(item => item.email).filter(email => email);
-  
-  // Proper duplicate email count - count records with duplicate emails
-  const emailCounts = emails.reduce((acc, email) => {
-    acc[email] = (acc[email] || 0) + 1;
+  // Email duplicate count - count records where email appears more than once
+  const emailCounts = data.reduce((acc, item) => {
+    if (item.email) {
+      acc[item.email] = (acc[item.email] || 0) + 1;
+    }
     return acc;
   }, {} as Record<string, number>);
-  const duplicateEmails = Object.values(emailCounts).reduce((total, count) => 
-    count > 1 ? total + count : total, 0);
   
-  // Email format validation
+  // Email format validation - use same regex as frontend
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const invalidEmails = emails.filter(email => !emailRegex.test(email)).length;
   
-  // Spam email check
-  const spamStats = getSpamStats(data);
+  // Categorize each record (mutually exclusive with priority order)
+  let duplicateEmails = 0;
+  let invalidEmails = 0;
+  let emptyNames = 0;
+  let spamEmails = 0;
+  let validRecords = 0;
   
-  // Empty fields
-  const emptyNames = data.filter(item => !item.name.trim()).length;
-  const emptyCompanies = data.filter(item => !item.company.trim()).length;
+  data.forEach(item => {
+    const emailCount = emailCounts[item.email] || 0;
+    const isDuplicate = emailCount > 1;
+    const isInvalidEmail = !item.email || !emailRegex.test(item.email);
+    const isEmptyName = !item.name || item.name.trim() === '';
+    const spamResult = checkSpamEmail(item.email);
+    const isSpam = spamResult.isSpam;
+    
+    // Priority order: duplicate > invalid > empty name > spam > valid
+    if (isDuplicate) {
+      duplicateEmails++;
+    } else if (isInvalidEmail) {
+      invalidEmails++;
+    } else if (isEmptyName) {
+      emptyNames++;
+    } else if (isSpam) {
+      spamEmails++;
+    } else {
+      validRecords++;
+    }
+  });
   
-  // Valid records (has email, name, and valid email format)
-  const validRecords = data.filter(item => 
-    item.email.trim() && 
-    item.name.trim() && 
-    emailRegex.test(item.email)
-  ).length;
+  // Empty companies (separate metric, not mutually exclusive)
+  const emptyCompanies = data.filter(item => !item.company || item.company.trim() === '').length;
   
   return {
     totalRecords: data.length,
@@ -177,7 +198,7 @@ export function getDataQualityStats(data: MarketingData[]): DataQualityStats {
     emptyNames,
     emptyCompanies,
     validRecords,
-    spamEmails: spamStats.spamCount,
+    spamEmails,
   };
 }
 
@@ -406,4 +427,16 @@ export function getDuplicateEmailInfo(data: MarketingData[]): {
     cleanedCount,
     removedCount
   };
+}
+
+export function getLicenseCounts(data: MarketingData[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  
+  data.forEach(item => {
+    if (item.license && item.license.trim() !== '') {
+      counts[item.license] = (counts[item.license] || 0) + 1;
+    }
+  });
+  
+  return counts;
 }

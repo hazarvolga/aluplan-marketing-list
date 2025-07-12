@@ -1,0 +1,708 @@
+{
+  "created_date": "2025-07-12T13:08:49.706446",
+  "total_dnc_records": 100,
+  "dnc_emails": [
+    "moroglufamily@gmail.com",
+    "ismozler@gmail.com",
+    "dewslow@gmail.com",
+    "moyelegen@gmail.com",
+    "ertan.turgut@std.yildiz.edu.tr",
+    "salih.gokmen@metu.edu.tr",
+    "harun.demirlek@std.yildiz.edu.tr",
+    "salihgkmn@gmail.com",
+    "mimarebrusaliha@gmail.com",
+    "bilgeakc@gmail.com",
+    "erdincbasbolat@gmail.com",
+    "emrealtinn.ea@gmail.com",
+    "ihalil1453457@gmail.com",
+    "yunusgonul@outlook.com",
+    "burakkozbek@hotmail.com",
+    "emreselmankaplan@gmail.com",
+    "gmm3dstudio@gmail.com",
+    "selinocak94@gmail.com",
+    "furkantrgl@icloud.com",
+    "abdullah.turanoglu@acainsaat.com",
+    "teknokent178@gmail.com",
+    "sserdarsimsek@gmail.com",
+    "didemtizman@gmail.com",
+    "yarici@fsm.edu.tr",
+    "m.ashraf0016@gmail.com",
+    "alpyilmaz@sunkoproje.com",
+    "moavsaroglu33@gmail.com",
+    "seckintemur@gmail.com",
+    "bekir.seyhan@metu.edu.tr",
+    "arslanmurat24@gmail.com",
+    "muhammedalisoysal@gmail.com",
+    "muhammrdalisoysal@gmail.com",
+    "i.can.beziklioglu@gmail.com",
+    "kcdulany25@gmail.com",
+    "talhakucuk26@gmail.com",
+    "prof.bekirseyhan@hotmail.com",
+    "adnanay1@gmail.com",
+    "ates0618bekir@gmail.com",
+    "proje@artabel.com.tr",
+    "lasersignature@hotmail.com",
+    "erim.inanc@gmail.com",
+    "yildirim100@hotmail.com",
+    "gokhanerkis85@gmail.com",
+    "baydil15@itu.edu.tr",
+    "eren@daalgic.com",
+    "eren.dalgic@gmail.com",
+    "tayfun.dogan@dorukmuhendislik.com",
+    "alpturgut@hotmail.com",
+    "t.ayberkaybatli@gmail.com",
+    "furkan.1997.79@gmail.com",
+    "r.aslibay@gmail.com",
+    "goril_sansurler_0c@icloud.com",
+    "sametyildirim2705@gmail.com",
+    "demokon.proje@gmail.com",
+    "cinaririz@hotmail.com",
+    "eminekeles88@gmail.com",
+    "ousanprlk@gmail.com",
+    "cagataygoker94@gmail.com",
+    "turan.mehmet@outlook.com",
+    "batuhankayhan95@gmail.com",
+    "emr.bakis@gmail.com",
+    "ilaydatambova98@gmail.com",
+    "simay.sertt@gmail.com",
+    "sanemcilingir@gmail.com",
+    "celik.ferhat@windowslive.com",
+    "izzetgormez@gmail.com",
+    "letkom@msn.com",
+    "osenturk@etraholding.com",
+    "yavuztrendmobilya@gmail.com",
+    "skavaz@ipkb.gov.tr",
+    "cahit@dank-design.com",
+    "okanozyurt@hotmail.com",
+    "av.feride@universalhukuk.com",
+    "mimtek@mimtekproje.com",
+    "sehribandyilmaz@gmail.com",
+    "buronoz@gmail.com",
+    "beziklioglu18@itu.edu.tr",
+    "serhan_gs_53@hotmail.com",
+    "beziklioglu@hotmail.com",
+    "info@geostatik.com.tr",
+    "omer@dorabilisim.com",
+    "burakbudak@ymail.com",
+    "iigac@superonline.com",
+    "ozge.ozturk7@gazi.edu.tr",
+    "izmirliogluelif@icloud.com",
+    "meric.guvercin@proneproje.com",
+    "cnsubl@gmail.com",
+    "serhat.bayur@dorukmuhendislik.com",
+    "mahsumbeki670@gmail.com",
+    "seyraninsaat@gmail.com",
+    "senahalicioglu@gmail.com",
+    "turken.muhammed@gmail.com",
+    "yanginenes@gmail.com",
+    "armagantemiz@windowslive.com",
+    "dizers@mef.edu.tr",
+    "guresbatuhan@gmail.com",
+    "yasemin@ofist.com",
+    "canburg@gmail.com",
+    "melekilay@gmail.com",
+    "gdagdas@gmail.com"
+  ],
+  "dnc_details": [
+    {
+      "name": "yaren moroglu",
+      "email": "moroglufamily@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Ismail Özler",
+      "email": "ismozler@gmail.com",
+      "company": "Gazi Üniversitesi",
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "dewslow@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Mehmet Öner Yeleğen",
+      "email": "moyelegen@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "ERTAN TURGUT",
+      "email": "ertan.turgut@std.yildiz.edu.tr",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "SALİH GÖKMEN",
+      "email": "salih.gokmen@metu.edu.tr",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Ali Harun Demirlek",
+      "email": "harun.demirlek@std.yildiz.edu.tr",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "salihgkmn@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "EBRU SALİHA KAYA",
+      "email": "mimarebrusaliha@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Bilge Akcaoglu",
+      "email": "bilgeakc@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Erdinc Basbolat",
+      "email": "erdincbasbolat@gmail.com",
+      "company": "SCÜ",
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "emrealtinn.ea@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "İbrahim Halil YILMAZ",
+      "email": "ihalil1453457@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Yunus Gönül",
+      "email": "yunusgonul@outlook.com",
+      "company": "Köstech Bilişim",
+      "segment": "DNC"
+    },
+    {
+      "name": "Burak ÖZBEK",
+      "email": "burakkozbek@hotmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Emre Selman Kaplan",
+      "email": "emreselmankaplan@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Ö  Uluç Gönül",
+      "email": "gmm3dstudio@gmail.com",
+      "company": "GÖNÜL Mimarlık Müh. İnş. Tic. Ltd. Şti.",
+      "segment": "DNC"
+    },
+    {
+      "name": "Inci Selin Ocak",
+      "email": "Selinocak94@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "furkan tıroğlu",
+      "email": "furkantrgl@icloud.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "abdullah.turanoglu@acainsaat.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Cemile baş",
+      "email": "teknokent178@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Sait Serdar Şimşek",
+      "email": "sserdarsimsek@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Didem Tızman",
+      "email": "didemtizman@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Yaprak Arıcı Üstüner",
+      "email": "yarici@fsm.edu.tr",
+      "company": "Fatih Sultan Mehmet Vakıf Üniversitesi",
+      "segment": "DNC"
+    },
+    {
+      "name": "Mohammad Ashraf Yawar",
+      "email": "m.ashraf0016@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Alp",
+      "email": "alpyilmaz@sunkoproje.com",
+      "company": "Sunko Proje",
+      "segment": "DNC"
+    },
+    {
+      "name": "Oğuzhan Avşaroğlu",
+      "email": "moavsaroglu33@gmail.com",
+      "company": "İstanbul Teknik Üniversitesi",
+      "segment": "DNC"
+    },
+    {
+      "name": "Sefer SeCkin Temur",
+      "email": "seckintemur@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Bekir Sami SEYHAN",
+      "email": "bekir.seyhan@metu.edu.tr",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Murat Arslan",
+      "email": "arslanmurat24@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Muhammed Ali SOYSAL",
+      "email": "muhammedalisoysal@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "muhammrdalisoysal@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Ibrahim",
+      "email": "i.can.beziklioglu@gmail.com",
+      "company": "Gizil Enerji",
+      "segment": "DNC"
+    },
+    {
+      "name": "📭 You have a gift from user. Withdrаw =>> https://forms.yandex.com/u/662517a702848f691bad5a61/?y81s 📭",
+      "email": "Kcdulany25@gmail.com",
+      "company": "hd3w26",
+      "segment": "DNC"
+    },
+    {
+      "name": "Abdussamet Günay",
+      "email": "talhakucuk26@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "prof.bekirseyhan@hotmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Adnan Ad",
+      "email": "adnanay1@gmail.com",
+      "company": "AKSUS",
+      "segment": "DNC"
+    },
+    {
+      "name": "bekir ateş",
+      "email": "ates0618bekir@gmail.com",
+      "company": "ateşler mekanik",
+      "segment": "DNC"
+    },
+    {
+      "name": "Taner Kurtuluş",
+      "email": "proje@artabel.com.tr",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Hakan Yüksel",
+      "email": "lasersignature@hotmail.com",
+      "company": "korallar inşaat",
+      "segment": "DNC"
+    },
+    {
+      "name": "Necdet Erim Inanç",
+      "email": "erim.inanc@gmail.com",
+      "company": "MNC DANIŞMANLIK",
+      "segment": "DNC"
+    },
+    {
+      "name": "Ali Yıldırım",
+      "email": "yildirim100@hotmail.com",
+      "company": "Tanyel Architecture",
+      "segment": "DNC"
+    },
+    {
+      "name": "gökhan erkiş",
+      "email": "gokhanerkis85@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Sibel Baydil",
+      "email": "baydil15@itu.edu.tr",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "eren@daalgic.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Eren Dalgiç",
+      "email": "eren.dalgic@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Tayfun Doğan",
+      "email": "tayfun.dogan@dorukmuhendislik.com",
+      "company": "Doruk Muhendislik",
+      "segment": "DNC"
+    },
+    {
+      "name": "Alperen Turgut",
+      "email": "alpturgut@hotmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "t.ayberkaybatli@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Ömer Furkan Temiz",
+      "email": "furkan.1997.79@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Resul Aslibay",
+      "email": "r.aslibay@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "goril_sansurler_0c@icloud.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Samet Yıldırım",
+      "email": "sametyildirim2705@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Burak Kabak",
+      "email": "demokon.proje@gmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "KAMIL ÇINAR IRIZ",
+      "email": "cinaririz@hotmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Emine Keleş",
+      "email": "eminekeles88@gmail.com",
+      "company": "Balıkesir Vakıflar Bölge Müdürlüğü",
+      "segment": "DNC"
+    },
+    {
+      "name": "Oğuzhan Parlak",
+      "email": "ousanprlk@gmail.com",
+      "company": "KMS ARCH.",
+      "segment": "DNC"
+    },
+    {
+      "name": "Can Çağatay Göker",
+      "email": "cagataygoker94@gmail.com",
+      "company": "MVG İletişim Teknoloji Ürünleri A.Ş",
+      "segment": "DNC"
+    },
+    {
+      "name": "Mehmet",
+      "email": "turan.mehmet@outlook.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Batuhan Kayhan",
+      "email": "batuhankayhan95@gmail.com",
+      "company": "İtü",
+      "segment": "DNC"
+    },
+    {
+      "name": "Emre Bakis",
+      "email": "emr.bakis@gmail.com",
+      "company": "daha kurulacak",
+      "segment": "DNC"
+    },
+    {
+      "name": "Ilayda Tambova",
+      "email": "ilaydatambova98@gmail.com",
+      "company": "Mazron architecture",
+      "segment": "DNC"
+    },
+    {
+      "name": "Simay Sert",
+      "email": "simay.sertt@gmail.com",
+      "company": "ESM Project",
+      "segment": "DNC"
+    },
+    {
+      "name": "Sanem Çilingir",
+      "email": "sanemcilingir@gmail.com",
+      "company": "Çalışmıyor",
+      "segment": "DNC"
+    },
+    {
+      "name": "Ferhat Çelik",
+      "email": "celik.ferhat@windowslive.com",
+      "company": "Ferhat Çelik Müh.",
+      "segment": "DNC"
+    },
+    {
+      "name": "Izzet Görmez",
+      "email": "izzetgormez@gmail.com",
+      "company": "Büyükartı İnşaat",
+      "segment": "DNC"
+    },
+    {
+      "name": "Özkan Çetin",
+      "email": "letkom@msn.com",
+      "company": "Çalışmıyorum",
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "osenturk@etraholding.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Fulya Uzer",
+      "email": "yavuztrendmobilya@gmail.com",
+      "company": "trendmobilya",
+      "segment": "DNC"
+    },
+    {
+      "name": "Saygın Kavaz",
+      "email": "skavaz@ipkb.gov.tr",
+      "company": "IPKB",
+      "segment": "DNC"
+    },
+    {
+      "name": "Cahit Musal",
+      "email": "cahit@dank-design.com",
+      "company": "Dank Ltd.",
+      "segment": "DNC"
+    },
+    {
+      "name": "Okan Özyurt",
+      "email": "okanozyurt@hotmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Feride Hilal Imal",
+      "email": "av.feride@universalhukuk.com",
+      "company": "UNİVERSAL HUKUK",
+      "segment": "DNC"
+    },
+    {
+      "name": "Hüseyin Karataş Inş",
+      "email": "mimtek@mimtekproje.com",
+      "company": "MİMTEK İnş. San. Taah. Ve Tic. Ltd. Şti.",
+      "segment": "DNC"
+    },
+    {
+      "name": "Şehriban Doğanyılmaz",
+      "email": "sehribandyilmaz@gmail.com",
+      "company": "sahıs",
+      "segment": "DNC"
+    },
+    {
+      "name": "Onur Özer",
+      "email": "buronoz@gmail.com",
+      "company": "İşsiz",
+      "segment": "DNC"
+    },
+    {
+      "name": "IBRAHIM CAN BEZIKLIOGLU",
+      "email": "beziklioglu18@itu.edu.tr",
+      "company": "Gizil",
+      "segment": "DNC"
+    },
+    {
+      "name": "Serhan Uzunhasanoğlu",
+      "email": "serhan_gs_53@hotmail.com",
+      "company": "UHO",
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "beziklioglu@hotmail.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Yıldırım Bayazıt",
+      "email": "info@geostatik.com.tr",
+      "company": "Geostatik Mühendislik",
+      "segment": "DNC"
+    },
+    {
+      "name": "Ömer Can Bölük",
+      "email": "omer@dorabilisim.com",
+      "company": "SVG Mimarlık Mühendislik",
+      "segment": "DNC"
+    },
+    {
+      "name": "Burak Budak",
+      "email": "burakbudak@ymail.com",
+      "company": "x",
+      "segment": "DNC"
+    },
+    {
+      "name": "İsmail  Iğaç",
+      "email": "iigac@superonline.com",
+      "company": "Metal Form A.Ş.",
+      "segment": "DNC"
+    },
+    {
+      "name": "Özge Öztürk",
+      "email": "ozge.ozturk7@gazi.edu.tr",
+      "company": "DENIZLER PROJE",
+      "segment": "DNC"
+    },
+    {
+      "name": "Elif Izmirlioğlu",
+      "email": "izmirliogluelif@icloud.com",
+      "company": "Izmir Institute of Technology",
+      "segment": "DNC"
+    },
+    {
+      "name": "Mahmut Meriç Güvercin",
+      "email": "meric.guvercin@proneproje.com",
+      "company": "Prone Bilişim",
+      "segment": "DNC"
+    },
+    {
+      "name": "Cansu Bol",
+      "email": "cnsubl@gmail.com",
+      "company": "MAPFRE GENEL SİGORTA",
+      "segment": "DNC"
+    },
+    {
+      "name": "Serhat Bayur",
+      "email": "serhat.bayur@dorukmuhendislik.com",
+      "company": "DORUK MUHENDISLIK",
+      "segment": "DNC"
+    },
+    {
+      "name": "Mahsum Beki",
+      "email": "mahsumbeki670@gmail.com",
+      "company": "mahsum beki",
+      "segment": "DNC"
+    },
+    {
+      "name": "Umut Taşkın",
+      "email": "seyraninsaat@gmail.com",
+      "company": "fatih sultan mehmet vakfı üniversitesi",
+      "segment": "DNC"
+    },
+    {
+      "name": "Sena Deniz Halicioğlu",
+      "email": "senahalicioglu@gmail.com",
+      "company": "REFORM ENDÜSTRİYEL İNŞAAT",
+      "segment": "DNC"
+    },
+    {
+      "name": "Muhammed Türken",
+      "email": "turken.muhammed@gmail.com",
+      "company": " -",
+      "segment": "DNC"
+    },
+    {
+      "name": "Enes Yangin",
+      "email": "yanginenes@gmail.com",
+      "company": "YANGIN",
+      "segment": "DNC"
+    },
+    {
+      "name": "Tugay Turan",
+      "email": "armagantemiz@windowslive.com",
+      "company": "tugay inşaat",
+      "segment": "DNC"
+    },
+    {
+      "name": "Şükrü Mert Dizer",
+      "email": "dizers@mef.edu.tr",
+      "company": "MEF Üniversitesi",
+      "segment": "DNC"
+    },
+    {
+      "name": "Batuhan Güreş",
+      "email": "guresbatuhan@gmail.com",
+      "company": "OHL",
+      "segment": "DNC"
+    },
+    {
+      "name": NaN,
+      "email": "yasemin@ofist.com",
+      "company": NaN,
+      "segment": "DNC"
+    },
+    {
+      "name": "Can Berk Taşkıran",
+      "email": "canburg@gmail.com",
+      "company": "Emay Uluslararası Müşavirlik ve Mühendislik A.Ş.",
+      "segment": "DNC"
+    },
+    {
+      "name": "Melek Işık",
+      "email": "melekilay@gmail.com",
+      "company": "Yez inşaat",
+      "segment": "DNC"
+    },
+    {
+      "name": "Gökay Dağdaş",
+      "email": "gdagdas@gmail.com",
+      "company": "Boğaziçi Üniversitesi",
+      "segment": "DNC"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "analysis_date": "2025-07-12T01:16:18.442399",
+  "total_emails": 3952,
+  "spam_count": 2,
+  "clean_count": 3950,
+  "spam_percentage": 0.05060728744939271,
+  "duplicate_count": 0,
+  "invalid_count": 3,
+  "spam_reasons": {
+    "Typo domain, Rastgele karakter": 1,
+    "Typo domain": 1
+  },
+  "top_domains": {
+    "gmail.com": 1565,
+    "hotmail.com": 524,
+    "yahoo.com": 92,
+    "yukselproje.com.tr": 60,
+    "outlook.com": 57,
+    "std.yildiz.edu.tr": 56,
+    "metu.edu.tr": 42,
+    "temelsu.com.tr": 36,
+    "erdemir.com.tr": 32,
+    "itu.edu.tr": 29,
+    "ronesans.com": 27,
+    "icloud.com": 21,
+    "enka.com": 16,
+    "windowslive.com": 16,
+    "msn.com": 15
+  },
+  "suspicious_domains": {
+    "tempo.biz.tr": 1
+  },
+  "spam_emails": [
+    "ozgurkinik@gmai.com",
+    "kadirr.kuru@gmai.com"
+  ],
+  "invalid_emails": [
+    "osman ergin@erginevler.com.tr",
+    "cpolatkıran@gmail.com",
+    "MMGOKDOGAN@yukselproje.com.tr>"
+  ]
+}
