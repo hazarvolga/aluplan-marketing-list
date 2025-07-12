@@ -192,6 +192,24 @@ export default function Home() {
   const filteredCounts = getSegmentCounts(filteredData);
   const qualityStats = getDataQualityStats(data);
   const companyStats = getCompanyStats(data);
+  
+  // Aktif filtrelere göre sayımları hesapla
+  const getActiveFilterCounts = () => {
+    const hasActiveFilters = Object.values(filters.segments).some(Boolean);
+    if (!hasActiveFilters) {
+      return {
+        total: 0,
+        mevcutMusteriler: 0,
+        potansiyelMusteriler: 0,
+        salesHubMevcut: 0,
+        v2022: 0,
+        v2023: 0,
+      };
+    }
+    return filteredCounts;
+  };
+  
+  const activeFilterCounts = getActiveFilterCounts();
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -545,7 +563,7 @@ export default function Home() {
               <span className="text-sm font-medium text-gray-600">Toplam</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {filteredCounts.total.toLocaleString()}
+              {activeFilterCounts.total.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
               5 kaynak birleştirildi
@@ -557,7 +575,7 @@ export default function Home() {
               <span className="text-sm font-medium text-gray-600">Mevcut Müşteriler</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {filteredCounts.mevcutMusteriler.toLocaleString()}
+              {activeFilterCounts.mevcutMusteriler.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
               %{companyStats.companyPercentage} şirket bilgisi
@@ -569,7 +587,7 @@ export default function Home() {
               <span className="text-sm font-medium text-gray-600">Potansiyel Müşteriler</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {filteredCounts.potansiyelMusteriler.toLocaleString()}
+              {activeFilterCounts.potansiyelMusteriler.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
               Mautic kaynak
@@ -581,7 +599,7 @@ export default function Home() {
               <span className="text-sm font-medium text-gray-600">Sales Hub</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {filteredCounts.salesHubMevcut.toLocaleString()}
+              {activeFilterCounts.salesHubMevcut.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
               Dynamics 365 kaynak
@@ -596,7 +614,7 @@ export default function Home() {
               <span className="text-sm font-medium text-gray-600">V2022</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {filteredCounts.v2022.toLocaleString()}
+              {activeFilterCounts.v2022.toLocaleString()}
             </p>
             <p className="text-xs text-gray-500 mt-1">
               Virtual segment • Mevcut segmentler korunur
@@ -608,7 +626,7 @@ export default function Home() {
               <span className="text-sm font-medium text-gray-600">V2023</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">
-              {filteredCounts.v2023.toLocaleString()}
+              {activeFilterCounts.v2023.toLocaleString()}
             </p>
           </div>
         </div>
