@@ -473,7 +473,6 @@ export function checkSpamContent(text: string): SpamCheckResult {
     return { isSpam: false, reason: '', email: text, score: 0 };
   }
   
-  const textLower = text.toLowerCase();
   let score = 0;
   const reasons: string[] = [];
   

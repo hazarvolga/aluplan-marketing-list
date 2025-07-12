@@ -487,7 +487,7 @@ export default function Home() {
                 </span>
               </div>
               <div className="ml-6 text-xs text-gray-500">
-                Sadece Mautic'ten gelen potansiyel müşteriler
+                Sadece Mautic&apos;ten gelen potansiyel müşteriler
               </div>
             </label>
             <label className="flex flex-col space-y-1">
